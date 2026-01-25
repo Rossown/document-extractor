@@ -1,3 +1,5 @@
+"use client";
+
 import { PaginatedTable } from "@/components/PaginatedTable";
 import { Customer } from "@/app/types";
 

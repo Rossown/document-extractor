@@ -95,7 +95,7 @@ class SalesOrderService:
     
     @staticmethod
     def list_sales_order_details(order_id, cursor_id=None, limit=Config.PAGINATION_DEFAULT_LIMIT):
-        order = SalesOrderHeader.query.filter_by(id=order_id)
+        order = SalesOrderDetail.query.filter(SalesOrderDetail.sales_order_id == order_id)
         if not order:
             logger.warning(f"Sales order with ID {order_id} not found.")
             raise NotFoundError(f"Sales order with ID {order_id} not found.")
@@ -103,7 +103,7 @@ class SalesOrderService:
     
     @staticmethod
     def get_sales_order_detail_by_id(order_id, detail_id):
-        order = SalesOrderHeader.query.get(order_id)
+        order = SalesOrderDetail.query.get(order_id)
         if not order:
             logger.warning(f"Sales order with ID {order_id} not found.")
             raise NotFoundError(f"Sales order with ID {order_id} not found.")
@@ -115,7 +115,7 @@ class SalesOrderService:
     
     @staticmethod
     def update_sales_order_detail(order_id, detail_id, **kwargs):
-        order = SalesOrderHeader.query.get(order_id)
+        order = SalesOrderDetail.query.get(order_id)
         if not order:
             logger.warning(f"Sales order with ID {order_id} not found.")
             raise NotFoundError(f"Sales order with ID {order_id} not found.")  
@@ -139,7 +139,7 @@ class SalesOrderService:
     
     @staticmethod
     def delete_sales_order_detail(order_id, detail_id):
-        order = SalesOrderHeader.query.get(order_id)
+        order = SalesOrderDetail.query.get(order_id)
         if not order:
             logger.warning(f"Sales order with ID {order_id} not found.")
             raise NotFoundError(f"Sales order with ID {order_id} not found.")

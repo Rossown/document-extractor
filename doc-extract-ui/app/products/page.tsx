@@ -1,3 +1,4 @@
+"use client";
 import { PaginatedTable } from "@/components/PaginatedTable";
 import { Product, ProductCategory, ProductSubCategory } from "@/app/types";
 
