@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
-from database import create_database_if_not_exists
+from utils import create_database_if_not_exists
 from api.routes import api
 from api.models import db
 
