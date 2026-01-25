@@ -34,7 +34,7 @@ export function PaginatedTable<T extends { id: number }>({
       const res = await fetch(url.toString());
       const json: PaginatedResponse<T> = await res.json();
 
-      setData((prev) => [...prev, ...json.items]);
+      setData(json.items);
       setNextCursor(json.next_cursor);
     } finally {
       setLoading(false);
@@ -54,7 +54,7 @@ export function PaginatedTable<T extends { id: number }>({
           <tr>
             {columns.map((col) => (
               <th
-                key={col.key as string}
+                key={`${endpoint}-${col.key as string}`}
                 className="border px-4 py-2 text-left bg-gray-100"
               >
                 {col.label}
@@ -64,9 +64,9 @@ export function PaginatedTable<T extends { id: number }>({
         </thead>
         <tbody>
           {data.map((row) => (
-            <tr key={row.id}>
+            <tr key={`${endpoint}-${row.id}`}>
               {columns.map((col) => (
-                <td key={col.key as string} className="border px-4 py-2">
+                <td key={`${endpoint}-${row.id}-${col.key as string}`} className="border px-4 py-2">
                   {String(row[col.key] ?? "")}
                 </td>
               ))}
