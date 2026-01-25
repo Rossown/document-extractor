@@ -13,7 +13,7 @@ def create_product():
 @product_bp.route('', methods=['GET'])
 def list_products():
     products = ProductService.list_products()
-    return jsonify([p.to_dict() for p in products])
+    return jsonify(products)
 
 @product_bp.route('/<int:product_id>', methods=['GET'])
 def get_product(product_id):

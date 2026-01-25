@@ -29,7 +29,7 @@ class SalesOrderService:
     
     @staticmethod
     def list_sales_orders():
-        return SalesOrderHeader.query.limit(10).all()
+        return SalesOrderHeader.query.all()
     
     @staticmethod
     def update_sales_order(order_id, **kwargs):
