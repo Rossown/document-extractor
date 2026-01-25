@@ -12,20 +12,22 @@ def create_customer():
 
 @customer_bp.route('', methods=['GET'])
 def list_customers():
-    customers = CustomerService.list_customers()
-    return jsonify([c.to_dict() for c in customers])
+    cursor = request.args.get('cursor', type=int)
+    limit = request.args.get('limit', type=int, default=20)
+    customers = CustomerService.list_customers(cursor_id=cursor, limit=limit)
+    return jsonify(customers), 200
 
 @customer_bp.route('/<int:customer_id>', methods=['GET'])
 def get_customer(customer_id):
     customer = CustomerService.get_customer_by_id(customer_id)
-    return jsonify(customer.to_dict())
+    return jsonify(customer.to_dict()), 200
 
 
 @customer_bp.route('/<int:customer_id>', methods=['PUT'])
 def update_customer(customer_id):
     data = request.get_json()
     result = CustomerService.update_customer(customer_id, **data)
-    return jsonify(result.to_dict())
+    return jsonify(result.to_dict()), 200
 
 @customer_bp.route('/<int:customer_id>', methods=['DELETE'])
 def delete_customer(customer_id):

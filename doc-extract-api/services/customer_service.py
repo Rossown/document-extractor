@@ -1,6 +1,7 @@
 from api.models import db, Customer, SalesTerritory
 from api.errors import NotFoundError, BadRequestError
-from config import logger
+from config import Config, logger
+from utils import paginate
 
 class CustomerService:
     @staticmethod
@@ -35,13 +36,13 @@ class CustomerService:
         return customer
         
     @staticmethod
-    def list_customers():
+    def list_customers(cursor_id=None, limit=Config.PAGINATION_DEFAULT_LIMIT):
         """ Get all customers """
-        customers = Customer.query.all()
+        customers = Customer.query
         if not customers:
             logger.warning("No customers found")
             raise NotFoundError("No customers found")
-        return customers
+        return paginate(customers, cursor_id=cursor_id, limit=limit)
 
     @staticmethod
     def update_customer(customer_id, person_id=None, store_id=None, territory_id=None, account_number=None):

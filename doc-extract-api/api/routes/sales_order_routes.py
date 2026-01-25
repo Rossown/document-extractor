@@ -16,7 +16,7 @@ def list_sales_orders():
     cursor = request.args.get('cursor', type=int)
     limit = request.args.get('limit', type=int, default=20)
     orders = SalesOrderService.list_sales_orders(cursor_id=cursor, limit=limit)
-    return jsonify([o.to_dict() for o in orders]), 200
+    return jsonify(orders), 200
 
 @sales_order_bp.route('/<int:order_id>', methods=['GET'])
 def get_sales_order(order_id):
@@ -46,15 +46,15 @@ def add_sales_order_detail(order_id):
 def list_sales_order_details(order_id):
     cursor = request.args.get('cursor', type=int)
     limit = request.args.get('limit', type=int, default=20)
-    details = SalesOrderService.get_sales_order_details(order_id)
-    return jsonify([d.to_dict() for d in details])
+    details = SalesOrderService.list_sales_order_details(order_id, cursor_id=cursor, limit=limit)
+    return jsonify(details), 200
 
 @sales_order_bp.route('/<int:order_id>/details/<int:detail_id>', methods=['GET'])
 def get_sales_order_detail(order_id, detail_id):
     detail = SalesOrderService.get_sales_order_detail_by_id(order_id, detail_id)
     if detail is None:
         return jsonify({"error": "Sales order detail not found"}), 404
-    return jsonify(detail.to_dict())
+    return jsonify(detail.to_dict()), 200
 
 
 @sales_order_bp.route('/<int:order_id>/details/<int:detail_id>', methods=['PUT'])

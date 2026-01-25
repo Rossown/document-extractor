@@ -37,7 +37,7 @@ class SalesOrderService:
         return order
     
     @staticmethod
-    def list_sales_orders(cursor_id=None, limit=20):
+    def list_sales_orders(cursor_id=None, limit=Config.PAGINATION_DEFAULT_LIMIT):
         query = SalesOrderHeader.query
         if not query:
             raise NotFoundError("No sales orders found.")
@@ -94,12 +94,12 @@ class SalesOrderService:
 
     
     @staticmethod
-    def get_sales_order_details(order_id):
-        order = SalesOrderHeader.query.get(order_id)
+    def list_sales_order_details(order_id, cursor_id=None, limit=Config.PAGINATION_DEFAULT_LIMIT):
+        order = SalesOrderHeader.query.filter_by(id=order_id)
         if not order:
             logger.warning(f"Sales order with ID {order_id} not found.")
             raise NotFoundError(f"Sales order with ID {order_id} not found.")
-        return order.sales_order_details
+        return paginate(order, cursor_id=cursor_id, limit=limit)
     
     @staticmethod
     def get_sales_order_detail_by_id(order_id, detail_id):

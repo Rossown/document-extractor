@@ -1,6 +1,7 @@
 from api.models import db, Person
 from api.errors import NotFoundError, BadRequestError
-from config import logger
+from config import Config, logger
+from utils import paginate
 
 class PersonService:
     @staticmethod
@@ -25,14 +26,13 @@ class PersonService:
         return person
     
     @staticmethod
-    def list_persons():
+    def list_persons(cursor_id=None, limit=Config.PAGINATION_DEFAULT_LIMIT):
         """ List all persons """
-        persons = Person.query.all()
+        persons = Person.query
         if not persons:
             logger.warning("No persons found")
             raise NotFoundError("No persons found")
-        logger.info(f"Found {len(persons)} persons")
-        return persons
+        return paginate(persons, cursor_id=cursor_id, limit=limit)
     
     @staticmethod
     def update_person(person_id, **kwargs):
