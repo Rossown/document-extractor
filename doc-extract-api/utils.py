@@ -12,7 +12,11 @@ def not_found_if_none(func):
         result = func(*args, **kwargs)
         if result is None:
             return jsonify({'error': 'Not found'}), 404
-        return jsonify(result.to_dict()), 200
+        if isinstance(result, list):
+            return jsonify([item.to_dict() for item in result]), 200
+        if hasattr(result, 'to_dict'):
+            return jsonify(result.to_dict()), 200
+        return jsonify(result), 200
     return wrapper
 
 def create_database_if_not_exists():

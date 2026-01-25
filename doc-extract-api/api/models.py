@@ -60,11 +60,11 @@ class SalesOrderHeader(BaseModel):
     sales_order_number = db.Column(db.String(25), unique=True)
     purchase_order_number = db.Column(db.String(25))
     account_number = db.Column(db.String(25))
-    customer_id = db.Column(db.String(50))
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
     sales_person_id = db.Column(db.String(50))
     territory_id = db.Column(db.Integer, db.ForeignKey('sales_territory.id'))
-    bill_to_address_id = db.Column(db.String(5))
-    ship_to_address_id = db.Column(db.String(5))
+    bill_to_address_id = db.Column(db.Integer)
+    ship_to_address_id = db.Column(db.Integer)
     ship_method_id = db.Column(db.Integer)
     credit_card_id = db.Column(db.String(15))
     credit_card_approval_code = db.Column(db.String(25))
@@ -73,6 +73,8 @@ class SalesOrderHeader(BaseModel):
     tax_amt = db.Column(db.Float)
     freight = db.Column(db.Float)
     total_due = db.Column(db.Float)
+    
+    sales_order_details = db.relationship('SalesOrderDetail', backref='sales_order', lazy=True)
 
     def __repr__(self):
         return f'<SalesOrderHeader {self.id}>'
