@@ -15,8 +15,10 @@ def create_territory():
 
 @territory_bp.route('', methods=['GET'])
 def list_territories():
-    territories = TerritoryService.list_territories()
-    return jsonify([t.to_dict() for t in territories])
+    cursor = request.args.get('cursor', type=int)
+    limit = request.args.get('limit', type=int, default=20)
+    territories = TerritoryService.list_territories(cursor_id=cursor, limit=limit)
+    return jsonify(territories)
 
 @territory_bp.route('/<int:territory_id>', methods=['GET'])
 def get_territory(territory_id):

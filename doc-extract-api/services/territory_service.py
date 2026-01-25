@@ -1,6 +1,7 @@
 from api.models import db, SalesTerritory
 from api.errors import NotFoundError, BadRequestError
-from config import logger
+from config import Config, logger
+from utils import paginate
 
 class TerritoryService:
     @staticmethod
@@ -32,14 +33,13 @@ class TerritoryService:
 
     
     @staticmethod
-    def list_territories():
+    def list_territories(cursor_id=None, limit=Config.PAGINATION_DEFAULT_LIMIT):
         """ Get all sales territories """
-        territories = SalesTerritory.query.all()
+        territories = SalesTerritory.query
         if not territories:
             logger.warning("No sales territories found")
             raise NotFoundError("No sales territories found")
-        logger.info(f"Found {len(territories)} sales territories")
-        return territories
+        return paginate(territories, order_by=SalesTerritory.id,cursor_id=cursor_id, limit=limit)
     
     @staticmethod
     def update_territory(territory_id, name=None, country_region_code=None, group=None):
