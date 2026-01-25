@@ -1,20 +1,20 @@
-from api.models import db, Customer
+from api.models import db, Customer, SalesTerritory
+from api.errors import NotFoundError, BadRequestError
 from config import logger
 
 class CustomerService:
     @staticmethod
     def create_customer(person_id, store_id, territory_id, account_number):
         """ Create a new customer """
-        from api.models import SalesTerritory
         try:
             # Check for duplicate account_number
             if Customer.query.filter_by(account_number=account_number).first():
                 logger.warning(f"Account number {account_number} already exists.")
-                return {"error": "Account number already exists."}
+                raise BadRequestError("Account number already exists.")
             # Check for valid territory_id
             if territory_id is not None and not SalesTerritory.query.get(territory_id):
                 logger.warning(f"Territory ID {territory_id} does not exist.")
-                return {"error": "Territory ID does not exist."}
+                raise NotFoundError("Territory ID does not exist.")
             customer = Customer(person_id=person_id, store_id=store_id, territory_id=territory_id, account_number=account_number)
             db.session.add(customer)
             db.session.commit()
@@ -23,33 +23,26 @@ class CustomerService:
         except Exception as e:
             logger.error(f"Error creating customer: {e}")
             db.session.rollback()
-            return {"error": str(e)}
+            raise BadRequestError(str(e))
         
     @staticmethod
     def get_customer_by_id(customer_id):
         """ Get a customer by its ID """
-        try:
-            customer = Customer.query.get(customer_id)
-            if customer:
-                logger.info(f"Found customer: {customer}")
-            else:
-                logger.warning(f"Customer with ID {customer_id} not found")
-            return customer
-        except Exception as e:
-            logger.error(f"Error retrieving customer with ID {customer_id}: {e}")
-            raise
+        customer = Customer.query.get(customer_id)
+        if not customer:
+            logger.warning(f"Customer with ID {customer_id} not found")
+            raise NotFoundError(f"Customer with ID {customer_id} not found")
+        return customer
         
     @staticmethod
     def list_customers():
         """ Get all customers """
-        try:
-            customers = Customer.query.all()
-            logger.info(f"Found {len(customers)} customers")
-            return customers
-        except Exception as e:
-            logger.error(f"Error retrieving customers: {e}")
-            raise
-    
+        customers = Customer.query.all()
+        if not customers:
+            logger.warning("No customers found")
+            raise NotFoundError("No customers found")
+        return customers
+
     @staticmethod
     def update_customer(customer_id, person_id=None, store_id=None, territory_id=None, account_number=None):
         """ Update a customer's information """
@@ -57,7 +50,8 @@ class CustomerService:
             customer = Customer.query.get(customer_id)
             if not customer:
                 logger.warning(f"Customer with ID {customer_id} not found")
-                return None
+                raise NotFoundError(f"Customer with ID {customer_id} not found")
+            
             if person_id:
                 customer.person_id = person_id
             if store_id:
@@ -76,17 +70,10 @@ class CustomerService:
     
     @staticmethod
     def delete_customer(customer_id):
-        try:
-            customer = Customer.query.get(customer_id)
-            if not customer:
-                logger.warning(f"Customer with ID {customer_id} not found")
-                return False
-            db.session.delete(customer)
-            db.session.commit()
-            logger.info(f"Deleted customer with ID {customer_id}")
-            return True
-        except Exception as e:
-            logger.error(f"Error deleting customer with ID {customer_id}: {e}")
-            db.session.rollback()
-            return False
-        
+        customer = Customer.query.get(customer_id)
+        if not customer:
+            logger.warning(f"Customer with ID {customer_id} not found")
+            raise NotFoundError(f"Customer with ID {customer_id} not found")
+        db.session.delete(customer)
+        db.session.commit()
+        logger.info(f"Deleted customer with ID {customer_id}")
