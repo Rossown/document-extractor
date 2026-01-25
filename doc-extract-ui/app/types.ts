@@ -1,5 +1,6 @@
 export interface Store {
   id: number;
+  business_entity_id: number;
   name: string;
   address_type?: string;
   address_line1?: string;
@@ -16,6 +17,21 @@ export interface Customer {
   store_id?: number;
   territory_id?: number;
   account_number?: string;
+}
+
+export interface Person {
+  id: number;
+  business_entity_id: number;
+  first_name?: string;
+  middle_name?: string;
+  last_name?: string;
+  address_type?: string;
+  address_line1?: string;
+  address_line2?: string;
+  city?: string;
+  state_province?: string;
+  postal_code?: string;
+  country_region?: string;
 }
 
 export interface SalesOrderHeader {
