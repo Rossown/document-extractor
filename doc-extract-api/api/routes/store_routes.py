@@ -16,8 +16,12 @@ def create_store():
         "postal_code": data.get("postal_code"),
         "country_region": data.get("country_region"),
     }
-    store = StoreService.create_store(data['name'], address_data)
-    return jsonify({'id': store.id}), 201
+    result = StoreService.create_store(data['name'], address_data)
+    if isinstance(result, dict) and "error" in result:
+        return jsonify(result), 400
+    if result is None:
+        return jsonify({"error": "Failed to create store"}), 400
+    return jsonify({'id': result.id}), 201
 
 @store_bp.route('', methods=['GET'])
 @not_found_if_none
@@ -33,8 +37,10 @@ def get_store(store_id):
 def update_store(store_id):
     data = request.get_json()
     try:
-        success = StoreService.update_store(store_id, **data)
-        if not success:
+        result = StoreService.update_store(store_id, **data)
+        if isinstance(result, dict) and "error" in result:
+            return jsonify(result), 400
+        if not result:
             return jsonify({"error": "Store not found"}), 404
         return jsonify({"message": "Store updated successfully"}), 200
     except Exception as e:

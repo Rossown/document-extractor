@@ -8,10 +8,12 @@ person_bp = Blueprint('persons', __name__)
 @person_bp.route('', methods=['POST'])
 def create_person():
     data = request.get_json()
-    person = PersonService.create_person(**data)
-    if person is None:
+    result = PersonService.create_person(**data)
+    if isinstance(result, dict) and "error" in result:
+        return jsonify(result), 400
+    if result is None:
         return jsonify({"error": "Failed to create person"}), 400
-    return jsonify(person.to_dict()), 201
+    return jsonify(result.to_dict()), 201
 
 @person_bp.route('', methods=['GET'])
 @not_found_if_none
@@ -26,10 +28,12 @@ def get_person(person_id):
 @person_bp.route('/<int:person_id>', methods=['PUT'])
 def update_person(person_id):
     data = request.get_json()
-    person = PersonService.update_person(person_id, **data)
-    if person is None:
+    result = PersonService.update_person(person_id, **data)
+    if isinstance(result, dict) and "error" in result:
+        return jsonify(result), 400
+    if result is None:
         return jsonify({"error": "Failed to update person"}), 400
-    return jsonify(person.to_dict())
+    return jsonify(result.to_dict())
 
 @person_bp.route('/<int:person_id>', methods=['DELETE'])
 def delete_person(person_id):
