@@ -6,8 +6,10 @@ from utils import create_database_if_not_exists
 from api.routes import api
 from api.models import db
 from api.error_handlers import register_error_handlers
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
 # Database configuration
 app.config.from_object(Config)
