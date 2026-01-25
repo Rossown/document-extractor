@@ -24,7 +24,7 @@ class ProductData(BaseModel):
     product_line = db.Column(db.String(50))
     class_field = db.Column(db.String(50))
     style = db.Column(db.String(50))
-    product_subcategory_id = db.Column(db.Integer)
+    product_subcategory_id = db.Column(db.Integer, db.ForeignKey('product_subcategory.id'))
     product_model_id = db.Column(db.Integer)
 
     def __repr__(self):
@@ -48,6 +48,7 @@ class ProductSubCategory(BaseModel):
     def __repr__(self):
         return f'<ProductSubCategory {self.name}>'
 
+# Done
 class SalesOrderHeader(BaseModel):
     __tablename__ = 'sales_order_header'
     id = db.Column(db.Integer, primary_key=True)
@@ -74,11 +75,12 @@ class SalesOrderHeader(BaseModel):
     freight = db.Column(db.Float)
     total_due = db.Column(db.Float)
     
-    sales_order_details = db.relationship('SalesOrderDetail', backref='sales_order', lazy=True)
+    sales_order_details = db.relationship('SalesOrderDetail', backref='sales_order', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<SalesOrderHeader {self.id}>'
-    
+
+# Done    
 class SalesOrderDetail(BaseModel):
     __tablename__ = 'sales_order_detail'
     id = db.Column(db.Integer, primary_key=True)
@@ -94,6 +96,7 @@ class SalesOrderDetail(BaseModel):
     def __repr__(self):
         return f'<SalesOrderDetail {self.id} for Order {self.sales_order_id}>'
     
+# Done
 class SalesTerritory(BaseModel):
     __tablename__ = 'sales_territory'
     id = db.Column(db.Integer, primary_key=True)
@@ -103,7 +106,8 @@ class SalesTerritory(BaseModel):
 
     def __repr__(self):
         return f'<SalesTerritory {self.name}>'
-    
+
+# Done    
 class Customer(BaseModel):
     __tablename__ = 'customer'
     id = db.Column(db.Integer, primary_key=True)
@@ -115,6 +119,7 @@ class Customer(BaseModel):
     def __repr__(self):
         return f'<Customer {self.first_name} {self.last_name}>'
     
+# Done
 class Person(BaseModel):
     __tablename__ = 'person'
     id = db.Column(db.Integer, primary_key=True)
@@ -131,7 +136,8 @@ class Person(BaseModel):
     
     def __repr__(self):
         return f'<Person {self.first_name} {self.last_name}>'
-    
+
+# Done    
 class Store(BaseModel):
     __tablename__ = 'store'
     id = db.Column(db.Integer, primary_key=True)
