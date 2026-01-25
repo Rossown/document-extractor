@@ -60,11 +60,24 @@ psql -U postgres -d doc_extract_api_db
 
 ## Add New Endpoints
 
-Edit `api/routes.py`:
+Create `api/routes/new_service_routes.py`
+Edit `api/routes/new_service_routes.py`:
 ```python
+from flask import Blueprint, jsonify
+from services.new_service import NewService
+from utils import not_found_if_none
+
+new_service_bp = Blueprint('new-service', __name__)
 @api.route('/new', methods=['GET'])
 def new_endpoint():
     return jsonify({'message': 'success'})
+```
+
+Edit `api/routes/__init__.py`:
+```python
+from .new_service_routes import new_service_bp
+...
+api.register_blueprint(new_service_bp, url_prefix='/new-service')
 ```
 
 ## Add New Models
