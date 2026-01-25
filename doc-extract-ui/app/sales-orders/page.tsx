@@ -3,8 +3,22 @@
 import { PaginatedTable } from "@/components/PaginatedTable";
 import { SalesOrderHeader, SalesOrderDetail } from "@/app/types";
     
+import Link from "next/link";
+
 const salesOrderColumns = [
-  { key: "id", label: "ID" },
+  {
+    key: "id",
+    label: "ID",
+    render: (row: SalesOrderHeader) => (
+      <Link
+        href={`/sales-details/${row.id}`}
+        className="text-blue-600 hover:underline"
+        title={`View details for order ${row.id}`}
+      >
+        {row.id}
+      </Link>
+    ),
+  },
   { key: "revision_number", label: "Revision Number" },
   { key: "order_date", label: "Order Date" },
   { key: "due_date", label: "Due Date" },
