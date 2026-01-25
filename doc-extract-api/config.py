@@ -71,3 +71,37 @@ class Config:
         "product_model_id",
         "product_subcategory_id"
     }
+    
+    SALES_ORDER_ALLOWED_FIELDS = {
+        "revision_number",
+        "order_date",
+        "due_date",
+        "ship_date",
+        "status",
+        "online_order_flag",
+        "purchase_order_number",
+        "account_number",
+        "customer_id",
+        "territory_id",
+        "bill_to_address_id",
+        "ship_to_address_id",
+        "ship_method_id",
+        "credit_card_id",
+        "credit_card_approval_code",
+        "currency_rate_id",
+        "sub_total",
+        "tax_amt",
+        "freight",
+        "total_due"
+    }
+    
+    SALES_ORDER_DETAIL_ALLOWED_FIELDS = {
+        "sales_order_id",
+        "carrier_tracking_number",
+        "order_qty",
+        "product_id",
+        "special_offer_id",
+        "unit_price",
+        "unit_price_discount",
+        "line_total"
+    }
