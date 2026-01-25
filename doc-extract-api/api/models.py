@@ -115,9 +115,15 @@ class Customer(BaseModel):
     store_id = db.Column(db.Integer, db.ForeignKey('store.id'))
     territory_id = db.Column(db.Integer, db.ForeignKey('sales_territory.id'))
     account_number = db.Column(db.String(25), unique=True)
+
+    person = db.relationship('Person', backref='customers')
+    store = db.relationship('Store', backref='customers')
+    territory = db.relationship('SalesTerritory', backref='customers')
     
     def __repr__(self):
-        return f'<Customer {self.first_name} {self.last_name}>'
+        if hasattr(self, 'person') and self.person:
+            return f'<Customer {self.person.first_name} {self.person.last_name}>'
+        return f'<Customer {self.account_number}>'
     
 # Done
 class Person(BaseModel):

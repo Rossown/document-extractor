@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from services.customer_service import CustomerService
-from utils import not_found_if_none
 
 customer_bp = Blueprint('customers', __name__)
 
@@ -16,14 +15,16 @@ def create_customer():
     return jsonify(result.to_dict()), 201
 
 @customer_bp.route('', methods=['GET'])
-@not_found_if_none
 def list_customers():
-    return CustomerService.list_customers()
+    customers = CustomerService.list_customers()
+    return jsonify([c.to_dict() for c in customers])
 
 @customer_bp.route('/<int:customer_id>', methods=['GET'])
-@not_found_if_none
 def get_customer(customer_id):
-    return CustomerService.get_customer_by_id(customer_id)
+    customer = CustomerService.get_customer_by_id(customer_id)
+    if customer is None:
+        return jsonify({"error": "Customer not found"}), 404
+    return jsonify(customer.to_dict())
 
 
 @customer_bp.route('/<int:customer_id>', methods=['PUT'])

@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
 from api.models import db, Person
 from services.person_service import PersonService
-from utils import not_found_if_none
 
 person_bp = Blueprint('persons', __name__)
 
@@ -16,14 +15,16 @@ def create_person():
     return jsonify(result.to_dict()), 201
 
 @person_bp.route('', methods=['GET'])
-@not_found_if_none
 def list_persons():
-    return PersonService.list_persons()
+    persons = PersonService.list_persons()
+    return jsonify([p.to_dict() for p in persons])
 
 @person_bp.route('/<int:person_id>', methods=['GET'])
-@not_found_if_none
 def get_person(person_id):
-    return PersonService.get_person_by_id(person_id)
+    person = PersonService.get_person_by_id(person_id)
+    if person is None:
+        return jsonify({"error": "Person not found"}), 404
+    return jsonify(person.to_dict())
 
 @person_bp.route('/<int:person_id>', methods=['PUT'])
 def update_person(person_id):

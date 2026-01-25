@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from services.territory_service import TerritoryService
-from utils import not_found_if_none
 
 territory_bp = Blueprint('territories', __name__)
 
@@ -15,14 +14,16 @@ def create_territory():
     return jsonify(result.to_dict()), 201
 
 @territory_bp.route('', methods=['GET'])
-@not_found_if_none
 def list_territories():
-    return TerritoryService.list_territories()
+    territories = TerritoryService.list_territories()
+    return jsonify([t.to_dict() for t in territories])
 
 @territory_bp.route('/<int:territory_id>', methods=['GET'])
-@not_found_if_none
 def get_territory(territory_id):
-    return TerritoryService.get_territory_by_id(territory_id)
+    territory = TerritoryService.get_territory_by_id(territory_id)
+    if territory is None:
+        return jsonify({"error": "Sales territory not found"}), 404
+    return jsonify(territory.to_dict())
 
 @territory_bp.route('/<int:territory_id>', methods=['PUT'])
 def update_territory(territory_id):

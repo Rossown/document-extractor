@@ -1,6 +1,5 @@
 from flask import Blueprint, abort, request, jsonify
 from services.store_service import StoreService
-from utils import not_found_if_none
 
 store_bp = Blueprint('stores', __name__)
 
@@ -24,14 +23,16 @@ def create_store():
     return jsonify({'id': result.id}), 201
 
 @store_bp.route('', methods=['GET'])
-@not_found_if_none
 def list_stores():
-    return StoreService.list_stores()
-    
+    store = StoreService.list_stores()
+    return jsonify([s.to_dict() for s in store])
+
 @store_bp.route('/<int:store_id>', methods=['GET'])
-@not_found_if_none
 def get_store(store_id):
-    return StoreService.get_store(store_id)
+    store = StoreService.get_store(store_id)
+    if store is None:
+        return jsonify({"error": "Store not found"}), 404
+    return jsonify(store.to_dict())
 
 @store_bp.route('/<int:store_id>', methods=['PUT'])
 def update_store(store_id):

@@ -1,6 +1,14 @@
+
 # Document Extractor API
 
-Flask REST API with PostgreSQL, SQLAlchemy ORM, and external API integration.
+This project is a modular Flask REST API for document and sales data management, using PostgreSQL and SQLAlchemy ORM. It supports:
+
+- CRUD operations for Products, Categories, Subcategories, Stores, Customers, Sales Orders, and more
+- Polymorphic address support for sales orders (person or store)
+- Relationship-aware endpoints (e.g., products include subcategory and category info)
+- Robust error handling for unique and foreign key constraints
+- Consistent JSON serialization for all endpoints
+- External API and AI integration for document extraction
 
 ## Setup
 
@@ -28,13 +36,10 @@ Flask REST API with PostgreSQL, SQLAlchemy ORM, and external API integration.
 
 ## Structure
 ```
-api/                    # Routes and models
-  ├── routes.py
-  └── models.py
-services/               # Business logic
-config.py              # Global config and logger
-database.py            # DB initialization
-app.py                 # Flask app entry point
+api/                      # API layer
+   ├── routes/             # All Flask route blueprints (one per resource)
+   └── models.py           # SQLAlchemy models
+services/                 # Business logic for each resource
 ```
 ## Logging
 
@@ -43,19 +48,6 @@ Logs include: timestamp, level, file:line, function name, message
 Example:
 ```
 2026-01-24 14:32:15 | INFO     | routes.py:10 | example_endpoint() | GET /example called
-```
-
-## Database Commands
-
-```bash
-# Connect
-psql -U postgres -d doc_extract_api_db
-
-# List tables
-\dt
-
-# Describe table
-\d table_name
 ```
 
 ## Add New Endpoints

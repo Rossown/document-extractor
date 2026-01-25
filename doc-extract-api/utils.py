@@ -6,21 +6,7 @@ from flask import jsonify
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from psycopg2 import sql
 
-def not_found_if_none(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        result = func(*args, **kwargs)
-        if result is None:
-            return jsonify({'error': 'Not found'}), 404
-        if isinstance(result, list):
-            return jsonify([
-                item if isinstance(item, dict) else item.to_dict()
-                for item in result
-            ]), 200
-        if hasattr(result, 'to_dict'):
-            return jsonify(result.to_dict()), 200
-        return jsonify(result), 200
-    return wrapper
+
 
 def create_database_if_not_exists():
     """

@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from services.sales_order_service import SalesOrderService
-from utils import not_found_if_none
 
 sales_order_bp = Blueprint('sales-orders', __name__)
 
@@ -32,14 +31,16 @@ def create_sales_order():
         return jsonify({"error": str(e)}), 500
     
 @sales_order_bp.route('', methods=['GET'])
-@not_found_if_none
 def list_sales_orders():
-    return SalesOrderService.list_sales_orders()
+    orders = SalesOrderService.list_sales_orders()
+    return jsonify([o.to_dict() for o in orders])
 
 @sales_order_bp.route('/<int:order_id>', methods=['GET'])
-@not_found_if_none
 def get_sales_order(order_id):
-    return SalesOrderService.get_sales_order_by_id(order_id)
+    order = SalesOrderService.get_sales_order_by_id(order_id)
+    if order is None:
+        return jsonify({"error": "Sales order not found"}), 404
+    return jsonify(order.to_dict())
     
 
 @sales_order_bp.route('/<int:order_id>', methods=['PUT'])
@@ -64,11 +65,13 @@ def delete_sales_order(order_id):
         return jsonify({"error": str(e)}), 500
     
 @sales_order_bp.route('/<int:order_id>/details', methods=['GET'])
-@not_found_if_none
 def list_sales_order_details(order_id):
-    return SalesOrderService.get_sales_order_details(order_id)
+    details = SalesOrderService.get_sales_order_details(order_id)
+    return jsonify([d.to_dict() for d in details])
 
 @sales_order_bp.route('/<int:order_id>/details/<int:detail_id>', methods=['GET'])
-@not_found_if_none
 def get_sales_order_detail(order_id, detail_id):
-    return SalesOrderService.get_sales_order_detail_by_id(order_id, detail_id)
+    detail = SalesOrderService.get_sales_order_detail_by_id(order_id, detail_id)
+    if detail is None:
+        return jsonify({"error": "Sales order detail not found"}), 404
+    return jsonify(detail.to_dict())

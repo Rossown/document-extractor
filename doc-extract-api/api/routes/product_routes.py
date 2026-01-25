@@ -1,19 +1,20 @@
 from flask import Blueprint, request, jsonify
 from services.product_service import ProductService
-from utils import not_found_if_none
 
 product_bp = Blueprint('products', __name__)
 
 # ProductData
 @product_bp.route('', methods=['GET'])
-@not_found_if_none
 def list_products():
-    return ProductService.list_products()
+    products = ProductService.list_products()
+    return jsonify(products)
 
 @product_bp.route('/<int:product_id>', methods=['GET'])
-@not_found_if_none
 def get_product(product_id):
-    return ProductService.get_product_by_id(product_id)
+    product = ProductService.get_product_by_id(product_id)
+    if product is None:
+        return jsonify({"error": "Product not found"}), 404
+    return jsonify(product)
 
 @product_bp.route('', methods=['POST'])
 def create_product():
@@ -45,14 +46,16 @@ def delete_product(product_id):
 # ProductSubCategory Routes
 
 @product_bp.route('/subcategories', methods=['GET'])
-@not_found_if_none
 def list_product_subcategories():
-    return ProductService.list_subcategories()
+    subcategories = ProductService.list_subcategories()
+    return jsonify([s.to_dict() for s in subcategories])
 
 @product_bp.route('/subcategories/<int:subcategory_id>', methods=['GET'])
-@not_found_if_none
 def get_product_subcategory(subcategory_id):
-    return ProductService.get_subcategory_by_id(subcategory_id)
+    subcategory = ProductService.get_subcategory_by_id(subcategory_id)
+    if subcategory is None:
+        return jsonify({"error": "Product subcategory not found"}), 404
+    return jsonify(subcategory.to_dict())
 
 @product_bp.route('/subcategories', methods=['POST'])
 def create_product_subcategory():
@@ -82,16 +85,18 @@ def delete_product_subcategory(subcategory_id):
     return jsonify({"message": "Product subcategory deleted successfully"}), 200
 
 # ProductCategory Routes
-
+    
 @product_bp.route('/categories', methods=['GET'])
-@not_found_if_none
 def list_product_categories():
-    return ProductService.list_categories()
+    products = ProductService.list_categories()
+    return jsonify([p.to_dict() for p in products])
 
 @product_bp.route('/categories/<int:category_id>', methods=['GET'])
-@not_found_if_none
 def get_product_category(category_id):
-    return ProductService.get_category_by_id(category_id)
+    category = ProductService.get_category_by_id(category_id)
+    if category is None:
+        return jsonify({"error": "Product category not found"}), 404
+    return jsonify(category.to_dict())
 
 @product_bp.route('/categories', methods=['POST'])
 def create_product_category():
