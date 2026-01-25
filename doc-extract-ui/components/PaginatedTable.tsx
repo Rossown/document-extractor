@@ -23,9 +23,11 @@ export function PaginatedTable<T extends { id: number }>({
 }: PaginatedTableProps<T>) {
   const [data, setData] = useState<T[]>([]);
   const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
+  const [prevCursors, setPrevCursors] = useState<(string | undefined)[]>([]); // history of cursors, include undefined for first page
+  const [currentCursor, setCurrentCursor] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(false);
 
-  const fetchPage = async (cursor?: string) => {
+  const fetchPage = async (cursor?: string, direction: 'next' | 'prev' = 'next') => {
     setLoading(true);
     try {
       const url = new URL(`${API_BASE_URL}${endpoint}`);
@@ -37,6 +39,13 @@ export function PaginatedTable<T extends { id: number }>({
 
       setData(json.items);
       setNextCursor(json.next_cursor);
+
+      if (direction === 'next') {
+        setPrevCursors((prev) => [...prev, currentCursor]);
+        setCurrentCursor(cursor);
+      } else if (direction === 'prev') {
+        setCurrentCursor(cursor);
+      }
     } finally {
       setLoading(false);
     }
@@ -44,9 +53,24 @@ export function PaginatedTable<T extends { id: number }>({
 
   useEffect(() => {
     setData([]); // reset data when endpoint changes
-    setNextCursor(undefined); // reset cursor when endpoint changes
-    fetchPage(); // initial load
+    setNextCursor(undefined);
+    setPrevCursors([]); // start with empty stack
+    setCurrentCursor(undefined); // first page cursor is undefined
+    fetchPage(undefined); // initial load
   }, [endpoint]);
+
+  const handleNext = () => {
+    if (nextCursor) fetchPage(nextCursor, 'next');
+  };
+
+  const handlePrev = () => {
+    if (prevCursors.length > 0) {
+      const prev = [...prevCursors];
+      const prevCursor = prev.pop();
+      setPrevCursors(prev);
+      fetchPage(prevCursor, 'prev');
+    }
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -70,24 +94,28 @@ export function PaginatedTable<T extends { id: number }>({
                 <td key={`${endpoint}-${row.id}-${col.key}`} className="border px-4 py-2">
                 {col.render? col.render(row) : (row as any)[col.key] ?? "" }
               </td>
-                
               ))}
             </tr>
           ))}
         </tbody>
       </table>
 
-      {nextCursor && (
-        <div className="mt-4 text-center">
-          <button
-            onClick={() => fetchPage(nextCursor)}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            disabled={loading}
-          >
-            {loading ? "Loading..." : "Load More"}
-          </button>
-        </div>
-      )}
+      <div className="mt-4 text-center flex justify-center gap-4">
+        <button
+          onClick={handlePrev}
+          className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:opacity-50"
+          disabled={loading || prevCursors.length === 0}
+        >
+          Previous
+        </button>
+        <button
+          onClick={handleNext}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          disabled={loading || !nextCursor}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
