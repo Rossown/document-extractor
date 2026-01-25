@@ -44,3 +44,14 @@ class Config:
     # Document Configuration
     UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', 'uploads')
     MAX_FILE_SIZE = int(os.getenv('MAX_FILE_SIZE', 10 * 1024 * 1024))  # 10MB
+    
+    STORE_ALLOWED_FIELDS = {
+        "name",
+        "address_type",
+        "address_line1",
+        "address_line2",
+        "city",
+        "state_province",
+        "postal_code",
+        "country_region"
+    }

@@ -15,44 +15,26 @@ def create_store():
         "postal_code": data.get("postal_code"),
         "country_region": data.get("country_region"),
     }
-    result = StoreService.create_store(data['name'], address_data)
-    if isinstance(result, dict) and "error" in result:
-        return jsonify(result), 400
-    if result is None:
-        return jsonify({"error": "Failed to create store"}), 400
-    return jsonify({'id': result.id}), 201
+    store = StoreService.create_store(data['name'], address_data)
+    return jsonify(store.to_dict()), 201
 
 @store_bp.route('', methods=['GET'])
 def list_stores():
-    store = StoreService.list_stores()
-    return jsonify([s.to_dict() for s in store])
+    stores = StoreService.list_stores()
+    return jsonify([s.to_dict() for s in stores]), 200
 
 @store_bp.route('/<int:store_id>', methods=['GET'])
 def get_store(store_id):
     store = StoreService.get_store(store_id)
-    if store is None:
-        return jsonify({"error": "Store not found"}), 404
-    return jsonify(store.to_dict())
+    return jsonify(store.to_dict()), 200
 
 @store_bp.route('/<int:store_id>', methods=['PUT'])
 def update_store(store_id):
     data = request.get_json()
-    try:
-        result = StoreService.update_store(store_id, **data)
-        if isinstance(result, dict) and "error" in result:
-            return jsonify(result), 400
-        if not result:
-            return jsonify({"error": "Store not found"}), 404
-        return jsonify({"message": "Store updated successfully"}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
+    store = StoreService.update_store(store_id, **data)
+    return jsonify(store.to_dict()), 200
+
 @store_bp.route('/<int:store_id>', methods=['DELETE'])
 def delete_store(store_id):
-    try:
-        success = StoreService.delete_store(store_id)
-        if not success:
-            return jsonify({"error": "Store not found"}), 404
-        return jsonify({"message": "Store deleted successfully"}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    StoreService.delete_store(store_id)
+    return jsonify({"message": "Store deleted successfully"}), 204

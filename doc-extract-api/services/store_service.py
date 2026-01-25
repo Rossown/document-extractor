@@ -1,84 +1,70 @@
 from api.models import db, Store
-from config import logger
+from api.errors import NotFoundError, BadRequestError
+from config import Config, logger
 
 
 class StoreService:
     @staticmethod
     def create_store(name, address_data):
         """Create a new store"""
-        try:
-            store = Store(
-                name=name,
-                **address_data
-            )
-            db.session.add(store)
-            db.session.commit()
-            logger.info(f"Store created: {store.name} (ID: {store.id})")
-            return store
-        except Exception as e:
-            logger.error(f"Error creating store: {e}")
-            db.session.rollback()
-            raise
+        if not name or not name.strip():
+            raise BadRequestError("Store name is required")
+        store = Store(
+            name=name,
+            **address_data
+        )
+        db.session.add(store)
+        db.session.commit()
+        logger.info(f"Store created: {store.name} (ID: {store.id})")
+        return store
     
     @staticmethod
     def get_store(store_id):
         """Get store by ID"""
-        try:
-            store = Store.query.get(store_id)
-            if not store:
-                logger.warning(f"Store not found: {store_id}")
-                return None
-            return store
-        except Exception as e:
-            logger.error(f"Error getting store: {e}")
-            raise
+        store = Store.query.get(store_id)
+        if not store:
+            logger.warning(f"Store not found: {store_id}")
+            raise NotFoundError(f"Store not found: {store_id}")
+        return store
     
     @staticmethod
     def list_stores():
         """Get all stores"""
-        try:
-            stores = Store.query.all()
-            logger.info(f"Retrieved {len(stores)} stores")
-            return stores
-        except Exception as e:
-            logger.error(f"Error listing stores: {e}")
-            raise
+        stores = Store.query.all()
+        if not stores:
+            raise NotFoundError("No stores found")
+        logger.info(f"Retrieved {len(stores)} stores")
+        return stores
+
     
     @staticmethod
     def update_store(store_id, **kwargs):
         """Update store by ID"""
-        try:
-            store = Store.query.get(store_id)
-            if not store:
-                logger.warning(f"Store not found: {store_id}")
-                return None
-            
-            for key, value in kwargs.items():
-                if hasattr(store, key):
-                    setattr(store, key, value)
-            
-            db.session.commit()
-            logger.info(f"Store updated: {store.name} (ID: {store_id})")
-            return store
-        except Exception as e:
-            logger.error(f"Error updating store: {e}")
-            db.session.rollback()
-            raise
+        store = Store.query.get(store_id)
+        if not store:
+            raise NotFoundError(f"Store not found: {store_id}")
+
+        updated = False
+        for key, value in kwargs.items():
+            if key in Config.STORE_ALLOWED_FIELDS:
+                setattr(store, key, value)
+                updated = True
+
+        if not updated:
+            raise BadRequestError("No valid fields provided for update")
+
+        db.session.commit()
+        logger.info(f"Store updated: ID {store_id}")
+        return store
+
     
     @staticmethod
     def delete_store(store_id):
         """Delete store by ID"""
-        try:
-            store = Store.query.get(store_id)
-            if not store:
-                logger.warning(f"Store not found: {store_id}")
-                return False
-            
-            db.session.delete(store)
-            db.session.commit()
-            logger.info(f"Store deleted: ID {store_id}")
-            return True
-        except Exception as e:
-            logger.error(f"Error deleting store: {e}")
-            db.session.rollback()
-            raise
+        store = Store.query.get(store_id)
+        if not store:
+            logger.warning(f"Store not found: {store_id}")
+            raise NotFoundError(f"Store not found: {store_id}")
+        db.session.delete(store)
+        db.session.commit()
+        logger.info(f"Store deleted: ID {store_id}")
