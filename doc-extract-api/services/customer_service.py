@@ -5,7 +5,16 @@ class CustomerService:
     @staticmethod
     def create_customer(person_id, store_id, territory_id, account_number):
         """ Create a new customer """
+        from api.models import SalesTerritory
         try:
+            # Check for duplicate account_number
+            if Customer.query.filter_by(account_number=account_number).first():
+                logger.warning(f"Account number {account_number} already exists.")
+                return {"error": "Account number already exists."}
+            # Check for valid territory_id
+            if territory_id is not None and not SalesTerritory.query.get(territory_id):
+                logger.warning(f"Territory ID {territory_id} does not exist.")
+                return {"error": "Territory ID does not exist."}
             customer = Customer(person_id=person_id, store_id=store_id, territory_id=territory_id, account_number=account_number)
             db.session.add(customer)
             db.session.commit()
@@ -14,7 +23,7 @@ class CustomerService:
         except Exception as e:
             logger.error(f"Error creating customer: {e}")
             db.session.rollback()
-            raise
+            return {"error": str(e)}
         
     @staticmethod
     def get_customer_by_id(customer_id):
