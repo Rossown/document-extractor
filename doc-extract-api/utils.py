@@ -6,43 +6,41 @@ from flask import jsonify
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from psycopg2 import sql
 
-
-def paginate(query, cursor_id=None, limit=20, order_by=None):
+def paginate(query, *, order_by, cursor_id=None, limit=20):
     """
     Cursor-based pagination for SQLAlchemy queries.
 
-    :param query: SQLAlchemy query object
-    :param cursor_id: the ID (or key) to start after
-    :param limit: max number of items to return
-    :param order_by: column to order by (SQLAlchemy column object)
-    :return: dict with items and next_cursor
+    :param query: SQLAlchemy Query
+    :param order_by: SQLAlchemy column (REQUIRED)
+    :param cursor_id: last seen value
+    :param limit: page size
     """
-    # Determine default order column if none provided
+
     if order_by is None:
-        model = query.column_descriptions[0]['entity']
-        if model is None:
-            raise ValueError("Cannot determine model from query, provide 'order_by'")
-        order_by = model.id  # assumes primary key column is named 'id'
+        raise ValueError("paginate() requires an explicit order_by column")
 
-    # Apply ordering
-    query = query.order_by(order_by)
+    # Always deterministic ordering
+    query = query.order_by(order_by.asc())
 
-    # Apply cursor filter
+    # Cursor filter (exclusive)
     if cursor_id is not None:
         query = query.filter(order_by > cursor_id)
 
-    # Fetch limited results
-    items = query.limit(limit).all()
+    # Fetch one extra row to detect next page
+    results = query.limit(limit + 1).all()
 
-    # Determine next cursor
-    next_cursor = getattr(items[-1], order_by.key) if items else None
+    next_cursor = None
+    if len(results) > limit:
+        next_cursor = getattr(results[limit - 1], order_by.key)
+        results = results[:limit]
 
     return {
-        "items": [item.to_dict() for item in items],
+        "items": [item.to_dict() for item in results],
         "next_cursor": next_cursor,
         "limit": limit,
-        "count": len(items)
+        "count": len(results),
     }
+
 
 
     

@@ -32,7 +32,7 @@ class PersonService:
         if not persons:
             logger.warning("No persons found")
             raise NotFoundError("No persons found")
-        return paginate(persons, cursor_id=cursor_id, limit=limit)
+        return paginate(persons, order_by=Person.business_entity_id, cursor_id=cursor_id, limit=limit)
     
     @staticmethod
     def update_person(person_id, **kwargs):

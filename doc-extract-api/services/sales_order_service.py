@@ -41,7 +41,7 @@ class SalesOrderService:
         query = SalesOrderHeader.query
         if not query:
             raise NotFoundError("No sales orders found.")
-        return paginate(query, cursor_id=cursor_id, limit=limit)
+        return paginate(query, order_by=SalesOrderHeader.id, cursor_id=cursor_id, limit=limit)
     
     @staticmethod
     def update_sales_order(order_id, **kwargs):
@@ -99,7 +99,7 @@ class SalesOrderService:
         if not order:
             logger.warning(f"Sales order with ID {order_id} not found.")
             raise NotFoundError(f"Sales order with ID {order_id} not found.")
-        return paginate(order, cursor_id=cursor_id, limit=limit)
+        return paginate(order, order_by=SalesOrderDetail.id, cursor_id=cursor_id, limit=limit)
     
     @staticmethod
     def get_sales_order_detail_by_id(order_id, detail_id):

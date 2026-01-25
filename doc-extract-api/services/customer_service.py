@@ -42,7 +42,7 @@ class CustomerService:
         if not customers:
             logger.warning("No customers found")
             raise NotFoundError("No customers found")
-        return paginate(customers, cursor_id=cursor_id, limit=limit)
+        return paginate(customers, order_by=Customer.id, cursor_id=cursor_id, limit=limit)
 
     @staticmethod
     def update_customer(customer_id, person_id=None, store_id=None, territory_id=None, account_number=None):

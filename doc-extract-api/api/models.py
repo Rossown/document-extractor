@@ -145,7 +145,7 @@ class Person(BaseModel):
 # Done    
 class Store(BaseModel):
     __tablename__ = 'store'
-    id = db.Column(db.BigInteger),
+    id = db.Column(db.BigInteger)
     business_entity_id = db.Column(db.BigInteger, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     address_type = db.Column(db.String(25))

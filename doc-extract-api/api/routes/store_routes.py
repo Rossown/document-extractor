@@ -20,8 +20,10 @@ def create_store():
 
 @store_bp.route('', methods=['GET'])
 def list_stores():
-    stores = StoreService.list_stores()
-    return jsonify([s.to_dict() for s in stores]), 200
+    cursor = request.args.get('cursor', type=int)
+    limit = request.args.get('limit', type=int, default=20)
+    stores = StoreService.list_stores(cursor_id=cursor, limit=limit)
+    return jsonify(stores), 200
 
 @store_bp.route('/<int:store_id>', methods=['GET'])
 def get_store(store_id):

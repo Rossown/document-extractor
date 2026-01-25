@@ -1,6 +1,7 @@
 from api.models import db, Store
 from api.errors import NotFoundError, BadRequestError
 from config import Config, logger
+from utils import paginate
 
 
 class StoreService:
@@ -28,13 +29,12 @@ class StoreService:
         return store
     
     @staticmethod
-    def list_stores():
+    def list_stores(cursor_id=None, limit=Config.PAGINATION_DEFAULT_LIMIT):
         """Get all stores"""
-        stores = Store.query.all()
+        stores = Store.query
         if not stores:
             raise NotFoundError("No stores found")
-        logger.info(f"Retrieved {len(stores)} stores")
-        return stores
+        return paginate(stores, order_by=Store.business_entity_id, cursor_id=cursor_id, limit=limit)
 
     
     @staticmethod
