@@ -6,6 +6,17 @@ Extract Sales Invoice information using OpenAI API
 
 # Setup
 
+## Flask commands
+```bash
+#Initialize migrations:
+flask --app app db init
+
+#Generate a migration:
+flask --app app db migrate -m "Initial migration"
+
+#Apply the migration:
+flask --app app db upgrade
+```
 
 ## Database Commands
 

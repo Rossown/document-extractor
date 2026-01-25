@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from config import Config
 from utils import create_database_if_not_exists
 from api.routes import api
@@ -11,16 +12,15 @@ app = Flask(__name__)
 # Database configuration
 app.config.from_object(Config)
 
-# Import models
+# Initialize the database (do not call db.create_all() when using migrations)
+create_database_if_not_exists()
+
+# Import models and initialize extensions
 db.init_app(app)
+migrate = Migrate(app, db)
 
 # Register error handlers
 register_error_handlers(app)
-
-# Initialize the database
-create_database_if_not_exists()
-with app.app_context():
-    db.create_all()
 
 # Register blueprints
 app.register_blueprint(api, url_prefix='/api')

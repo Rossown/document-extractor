@@ -1,6 +1,8 @@
 from flask import jsonify
 from api.errors import AppError
+from api.models import db
 from config import logger
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 def register_error_handlers(app):
 
@@ -23,3 +25,16 @@ def register_error_handlers(app):
         return jsonify({
             "error": "Internal server error"
         }), 500
+        
+
+    @app.errorhandler(SQLAlchemyError)
+    def handle_db_error(error):
+        db.session.rollback()
+        logger.exception("Database error")
+        return jsonify({"error": "Database error"}), 500
+
+    @app.errorhandler(IntegrityError)
+    def handle_integrity_error(error):
+        db.session.rollback()
+        logger.exception("Integrity error")
+        return jsonify({"error": "Integrity error"}), 409

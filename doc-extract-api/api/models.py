@@ -147,7 +147,7 @@ class Person(BaseModel):
 class Store(BaseModel):
     __tablename__ = 'store'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), nullable=False, unique=True)
     address_type = db.Column(db.String(25))
     address_line1 = db.Column(db.String(100))
     address_line2 = db.Column(db.String(100))
