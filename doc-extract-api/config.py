@@ -55,3 +55,19 @@ class Config:
         "postal_code",
         "country_region"
     }
+    
+    PRODUCT_ALLOWED_FIELDS = {
+        "product_name",
+        "product_number",
+        "make_flag",
+        "finished_goods_flag",
+        "color",
+        "standard_cost",
+        "list_price",
+        "size",
+        "product_line",
+        "class_field",
+        "style",
+        "product_model_id",
+        "product_subcategory_id"
+    }
