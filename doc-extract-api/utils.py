@@ -33,6 +33,7 @@ def paginate(query, *, order_by, cursor_id=None, limit=20):
     if len(results) > limit:
         next_cursor = getattr(results[limit - 1], order_by.key)
         results = results[:limit]
+        
 
     return {
         "items": [item.to_dict() for item in results],
@@ -40,9 +41,6 @@ def paginate(query, *, order_by, cursor_id=None, limit=20):
         "limit": limit,
         "count": len(results),
     }
-
-
-
     
 def create_database_if_not_exists():
     """

@@ -13,6 +13,7 @@ export interface Product {
   style: string;
   product_subcategory_id: number;
   product_model_id: number;
+  subcategory?: ProductSubCategory;
 }
 
 export interface ProductCategory {
@@ -24,6 +25,7 @@ export interface ProductSubCategory {
   id: number;
   name: string;
   product_category_id: number;
+  category?: ProductCategory;
 }
 
 export interface SalesOrderHeader {

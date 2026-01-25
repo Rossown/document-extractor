@@ -27,6 +27,8 @@ class ProductData(BaseModel):
     product_subcategory_id = db.Column(db.Integer, db.ForeignKey('product_subcategory.id'))
     product_model_id = db.Column(db.Integer)
 
+    subcategory = db.relationship('ProductSubCategory', backref='products', lazy="selectin")
+    category = db.relationship('ProductCategory', secondary='product_subcategory', viewonly=True, lazy="selectin")
     def __repr__(self):
         return f'<ProductData {self.product_number}>'
     

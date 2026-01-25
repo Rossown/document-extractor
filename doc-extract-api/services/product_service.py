@@ -1,20 +1,25 @@
 from api.models import db, ProductData, ProductCategory, ProductSubCategory
 from api.errors import NotFoundError, BadRequestError
 from config import Config, logger
+from utils import paginate
+from sqlalchemy.orm import selectinload
 
 class ProductService:
 
     @staticmethod
     def to_dict_with_relations(product):
+        """
+        Converts a ProductData instance to dict, including nested subcategory & category.
+        """
         data = product.to_dict()
-        # Add subcategory info
-        subcat = ProductSubCategory.query.get(product.product_subcategory_id) if product.product_subcategory_id else None
-        if subcat:
+
+        if hasattr(product, "subcategory") and product.subcategory:
+            subcat = product.subcategory
             data["subcategory"] = subcat.to_dict()
-            # Add category info
-            cat = ProductCategory.query.get(subcat.category_id) if subcat.category_id else None
-            if cat:
-                data["subcategory"]["category"] = cat.to_dict()
+
+            if hasattr(subcat, "category") and subcat.category:
+                data["subcategory"]["category"] = subcat.category.to_dict()
+
         return data
     
     # Category
@@ -37,12 +42,12 @@ class ProductService:
         return category
 
     @staticmethod
-    def list_categories():
-        categories = ProductCategory.query.all()
+    def list_categories(cursor_id=None, limit=Config.PAGINATION_DEFAULT_LIMIT):
+        categories = ProductCategory.query
         if not categories:
             logger.warning("No ProductCategories found.")
             raise NotFoundError("No ProductCategories found")
-        return categories
+        return paginate(categories, order_by=ProductCategory.id, cursor_id=cursor_id, limit=limit)
 
     @staticmethod
     def update_category(category_id, **kwargs):
@@ -99,12 +104,12 @@ class ProductService:
         return subcategory
 
     @staticmethod
-    def list_subcategories():
+    def list_subcategories(cursor_id=None, limit=Config.PAGINATION_DEFAULT_LIMIT):
         subcategories = ProductSubCategory.query.all()
         if not subcategories:
             logger.warning("No ProductSubCategories found.")
             raise NotFoundError("No ProductSubCategories found")
-        return subcategories
+        return paginate(subcategories, order_by=ProductSubCategory.id, cursor_id=cursor_id, limit=limit)
 
     @staticmethod
     def update_subcategory(subcategory_id, **kwargs):
@@ -164,12 +169,16 @@ class ProductService:
         return ProductService.to_dict_with_relations(product)
 
     @staticmethod
-    def list_products():
-        products = ProductData.query.all()
-        if not products:
-            logger.warning("No products found.")
+    def list_products(cursor_id=None, limit=Config.PAGINATION_DEFAULT_LIMIT):
+        query = ProductData.query.options(
+            selectinload(ProductData.subcategory).selectinload(ProductSubCategory.category)
+        )
+        if not query:
             raise NotFoundError("No products found.")
-        return [ProductService.to_dict_with_relations(p) for p in products]
+        paginated = paginate(query, order_by=ProductData.id, cursor_id=cursor_id, limit=limit)
+        items_with_relations = [ProductService.to_dict_with_relations(p) for p in query.filter(ProductData.id.in_([item["id"] for item in paginated["items"]])).all()]
+        paginated["items"] = items_with_relations
+        return paginated
 
     @staticmethod
     def update_product(product_id, **kwargs):

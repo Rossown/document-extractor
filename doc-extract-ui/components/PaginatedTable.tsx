@@ -5,8 +5,9 @@ import { PaginatedResponse } from "@/app/types";
 import { API_BASE_URL } from "@/lib/config";
 
 export interface Column<T> {
-  key: keyof T;
+  key: string;
   label: string;
+  render?: (row: T) => React.ReactNode;
 }
 
 interface PaginatedTableProps<T> {
@@ -66,9 +67,10 @@ export function PaginatedTable<T extends { id: number }>({
           {data.map((row) => (
             <tr key={`${endpoint}-${row.id}`}>
               {columns.map((col) => (
-                <td key={`${endpoint}-${row.id}-${col.key as string}`} className="border px-4 py-2">
-                  {String(row[col.key] ?? "")}
-                </td>
+                <td key={`${endpoint}-${row.id}-${col.key}`} className="border px-4 py-2">
+                {col.render? col.render(row) : (row as any)[col.key] ?? "" }
+              </td>
+                
               ))}
             </tr>
           ))}

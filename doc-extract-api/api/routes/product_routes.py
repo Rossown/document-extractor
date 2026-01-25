@@ -12,8 +12,10 @@ def create_product():
 
 @product_bp.route('', methods=['GET'])
 def list_products():
-    products = ProductService.list_products()
-    return jsonify(products)
+    cursor = request.args.get('cursor', type=int)
+    limit = request.args.get('limit', type=int, default=20)
+    products = ProductService.list_products(cursor_id=cursor, limit=limit)
+    return jsonify(products), 200
 
 @product_bp.route('/<int:product_id>', methods=['GET'])
 def get_product(product_id):
@@ -41,8 +43,10 @@ def create_product_subcategory():
 
 @product_bp.route('/subcategories', methods=['GET'])
 def list_product_subcategories():
-    subcategories = ProductService.list_subcategories()
-    return jsonify([s.to_dict() for s in subcategories])
+    cursor = request.args.get('cursor', type=int)
+    limit = request.args.get('limit', type=int, default=20)
+    subcategories = ProductService.list_subcategories(cursor_id=cursor, limit=limit)
+    return jsonify(subcategories), 200
 
 @product_bp.route('/subcategories/<int:subcategory_id>', methods=['GET'])
 def get_product_subcategory(subcategory_id):
@@ -70,8 +74,10 @@ def create_product_category():
 
 @product_bp.route('/categories', methods=['GET'])
 def list_product_categories():
-    products = ProductService.list_categories()
-    return jsonify([p.to_dict() for p in products])
+    cursor = request.args.get('cursor', type=int)
+    limit = request.args.get('limit', type=int, default=20)
+    products = ProductService.list_categories(cursor_id=cursor, limit=limit)
+    return jsonify(products), 200
 
 @product_bp.route('/categories/<int:category_id>', methods=['GET'])
 def get_product_category(category_id):
