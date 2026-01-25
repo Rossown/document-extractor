@@ -10,6 +10,7 @@ from .sales_order_routes import sales_order_bp
 from .territory_routes import territory_bp
 from .customer_routes import customer_bp
 from .person_routes import person_bp
+from .product_routes import product_bp
 
 # Register sub-blueprints
 api.register_blueprint(store_bp, url_prefix='/stores')
