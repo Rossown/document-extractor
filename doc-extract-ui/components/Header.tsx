@@ -33,31 +33,6 @@ function generateBreadcrumbs(pathname: string) {
 export function Header() {
   const pathname = usePathname();
   const breadcrumbs = generateBreadcrumbs(pathname);
-  const [darkMode, setDarkMode] = useState(false);
-
-  // Initialize theme ONCE
-  useEffect(() => {
-    const theme = localStorage.getItem("theme");
-    const isDark = theme === "dark";
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    setDarkMode(isDark);
-  }, []);
-
-  const handleToggle = () => {
-    const next = !darkMode;
-    setDarkMode(next);
-    if (next) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  };
 
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 shadow">
@@ -85,26 +60,6 @@ export function Header() {
             </Link>
           ))}
         </nav>
-
-        {/* Theme toggle */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-700 dark:text-gray-300">
-            {darkMode ? "Dark" : "Light"} Mode
-          </span>
-          <button
-            onClick={handleToggle}
-            aria-label="Toggle dark mode"
-            className={`relative w-12 h-6 rounded-full transition-colors ${
-              darkMode ? "bg-blue-600" : "bg-gray-300"
-            }`}
-          >
-            <span
-              className={`absolute top-1 left-1 h-4 w-4 rounded-full bg-white shadow transition-transform ${
-                darkMode ? "translate-x-6" : ""
-              }`}
-            />
-          </button>
-        </div>
 
         {/* Breadcrumbs */}
         <nav className="text-sm text-gray-500 dark:text-gray-400">

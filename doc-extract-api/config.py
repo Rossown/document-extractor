@@ -38,7 +38,7 @@ class Config:
         
     # OpenAI Configuration
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
-    OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-4-turbo')
+    OPENAI_MODEL = os.getenv('OPENAI_MODEL', 'gpt-5-nano')
     OPENAI_MAX_TOKENS = int(os.getenv('OPENAI_MAX_TOKENS', 2000))
     
     # Document Configuration
