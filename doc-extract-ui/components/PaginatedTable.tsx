@@ -73,33 +73,34 @@ export function PaginatedTable<T extends { id: number }>({
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="table-auto w-full border border-gray-200">
-        <thead>
-          <tr>
-            {columns.map((col) => (
-              <th
-                key={`${endpoint}-${col.key as string}`}
-                className="border px-4 py-2 text-left bg-gray-100"
-              >
-                {col.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((row) => (
-            <tr key={`${endpoint}-${row.id}`}>
+    <div className="w-full overflow-x-auto max-w-full">
+      <div className="min-w-[700px] max-w-[1200px] mx-auto">
+        <table className="table-auto w-full border border-gray-200 text-sm">
+          <thead className="sticky top-0 z-10">
+            <tr>
               {columns.map((col) => (
-                <td key={`${endpoint}-${row.id}-${col.key}`} className="border px-4 py-2">
-                {col.render? col.render(row) : (row as any)[col.key] ?? "" }
-              </td>
+                <th
+                  key={`${endpoint}-${col.key as string}`}
+                  className="border px-4 py-2 text-left bg-gray-100 whitespace-nowrap"
+                >
+                  {col.label}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-
+          </thead>
+          <tbody>
+            {data.map((row) => (
+              <tr key={`${endpoint}-${row.id}`}>
+                {columns.map((col) => (
+                  <td key={`${endpoint}-${row.id}-${col.key}`} className="border px-4 py-2 whitespace-nowrap">
+                    {col.render ? col.render(row) : (row as any)[col.key] ?? ""}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <div className="mt-4 text-center flex justify-center gap-4">
         <button
           onClick={handlePrev}
