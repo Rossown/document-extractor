@@ -26,7 +26,8 @@ def get_product(product_id):
 @product_bp.route('/<int:product_id>', methods=['PUT'])
 def update_product(product_id):
     data = request.get_json()
-    result = ProductService.update_product(product_id, data)
+    data.pop("id", None)
+    result = ProductService.update_product(product_id, **data)
     return jsonify(result.to_dict()), 200
 
 @product_bp.route('/<int:product_id>', methods=['DELETE'])
@@ -57,6 +58,7 @@ def get_product_subcategory(subcategory_id):
 @product_bp.route('/subcategories/<int:subcategory_id>', methods=['PUT'])
 def update_product_subcategory(subcategory_id):
     data = request.get_json()
+    data.pop("id", None)
     result = ProductService.update_subcategory(subcategory_id, data)
     return jsonify(result.to_dict()), 200
 
@@ -88,6 +90,7 @@ def get_product_category(category_id):
 @product_bp.route('/categories/<int:category_id>', methods=['PUT'])
 def update_product_category(category_id):
     data = request.get_json()
+    data.pop("id", None)
     result = ProductService.update_category(category_id, data)
     return jsonify(result.to_dict()), 200
 

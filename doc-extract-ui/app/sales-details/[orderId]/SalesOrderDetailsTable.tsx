@@ -57,7 +57,7 @@ export default function SalesOrderDetailsTable({ orderId }: Props) {
 
   return (
     <>
-      <PaginatedTable<SalesOrderDetail>
+      <PaginatedTable
         columns={columns}
         endpoint={`/api/sales-orders/${orderId}/details`}
         pageSize={20}

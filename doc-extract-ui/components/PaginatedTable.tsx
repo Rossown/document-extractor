@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useImperativeHandle, forwardRef } from "react";
 import { PaginatedResponse } from "@/app/types";
 import { API_BASE_URL } from "@/lib/config";
 
@@ -16,11 +16,11 @@ interface PaginatedTableProps<T> {
   pageSize?: number;
 }
 
-export function PaginatedTable<T extends { id: number }>({
+const PaginatedTableInner = <T extends { id: number }>({
   columns,
   endpoint,
   pageSize = 20,
-}: PaginatedTableProps<T>) {
+}: PaginatedTableProps<T>, ref: React.Ref<{ reload: () => void }>) => {
   const [data, setData] = useState<T[]>([]);
   const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
   const [prevCursors, setPrevCursors] = useState<(string | undefined)[]>([]); // history of cursors, include undefined for first page
@@ -58,6 +58,10 @@ export function PaginatedTable<T extends { id: number }>({
     setCurrentCursor(undefined); // first page cursor is undefined
     fetchPage(undefined); // initial load
   }, [endpoint]);
+
+  useImperativeHandle(ref, () => ({
+    reload: () => fetchPage(undefined),
+  }));
 
   const handleNext = () => {
     if (nextCursor) fetchPage(nextCursor, 'next');
@@ -119,4 +123,6 @@ export function PaginatedTable<T extends { id: number }>({
       </div>
     </div>
   );
-}
+};
+
+export const PaginatedTable = forwardRef(PaginatedTableInner);

@@ -33,6 +33,7 @@ def get_store(store_id):
 @store_bp.route('/<int:store_id>', methods=['PUT'])
 def update_store(store_id):
     data = request.get_json()
+    data.pop("id", None)
     store = StoreService.update_store(store_id, **data)
     return jsonify(store.to_dict()), 200
 

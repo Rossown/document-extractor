@@ -59,8 +59,7 @@ class CustomerService:
                 customer.store_id = store_id
             if territory_id:
                 customer.territory_id = territory_id
-            if account_number:
-                customer.account_number = account_number
+
             db.session.commit()
             logger.info(f"Updated customer: {customer}")
             return customer
