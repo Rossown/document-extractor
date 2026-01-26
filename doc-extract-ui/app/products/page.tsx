@@ -1,6 +1,6 @@
 "use client";
 import { PaginatedTable } from "@/components/PaginatedTable";
-import { Product, ProductCategory, ProductSubCategory } from "@/app/types";
+import { Product } from "@/app/types";
 import { useState, useRef } from "react";
 import EditProductModal from "@/components/EditProductModal";
 import { API_BASE_URL } from "@/lib/config";
@@ -58,7 +58,7 @@ export default function ProductsPage() {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Products</h1>
-      <PaginatedTable
+      <PaginatedTable<Product>
         ref={tableRef}
         columns={productColumns}
         endpoint="/api/products?cursor=business_entity_id"
