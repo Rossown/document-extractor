@@ -103,7 +103,7 @@ class SalesOrderService:
     
     @staticmethod
     def get_sales_order_detail_by_id(order_id, detail_id):
-        order = SalesOrderDetail.query.get(order_id)
+        order = SalesOrderHeader.query.get(order_id)
         if not order:
             logger.warning(f"Sales order with ID {order_id} not found.")
             raise NotFoundError(f"Sales order with ID {order_id} not found.")
