@@ -10,6 +10,7 @@ const navItems = [
   { href: "/sales-orders", label: "Sales Orders" },
   { href: "/stores", label: "Stores" },
   { href: "/territories", label: "Territories" },
+  { href: "/people", label: "People" }, // Added People link
 ]
 
 export function Nav() {

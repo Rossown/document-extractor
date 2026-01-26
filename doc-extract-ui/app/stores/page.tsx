@@ -14,9 +14,22 @@ export default function StoresPage() {
   const [searchedStore, setSearchedStore] = useState<Store | null>(null);
   const [searchError, setSearchError] = useState("");
 
+  const [detailStore, setDetailStore] = useState<Store | null>(null);
+
   const storeColumns = [
-    { key: "business_entity_id", label: "Business Entity ID" },
-    { key: "id", label: "ID" },
+    {
+      key: "business_entity_id",
+      label: "Business Entity ID",
+      render: (row: Store) => (
+        <button
+          className="text-blue-600 hover:underline px-2 py-1"
+          onClick={() => setDetailStore(row)}
+        >
+          {row.business_entity_id}
+        </button>
+      ),
+    },
+    { key: "id", label: "ID" }, // Plain, not a link
     { key: "name", label: "Name" },
     { key: "address_type", label: "Address Type" },
     { key: "address_line1", label: "Address Line 1" },
@@ -86,6 +99,9 @@ export default function StoresPage() {
       {searchError && <div className="text-red-600 mb-2">{searchError}</div>}
       {searchedStore && (
         <StoreDetailPopup store={searchedStore} onClose={() => setSearchedStore(null)} />
+      )}
+      {detailStore && (
+        <StoreDetailPopup store={detailStore} onClose={() => setDetailStore(null)} />
       )}
       {editStore && (
         <EditStoreModal

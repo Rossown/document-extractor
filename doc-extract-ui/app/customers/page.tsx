@@ -3,10 +3,12 @@
 import { PaginatedTable } from "@/components/PaginatedTable";
 import { Customer } from "@/app/types";
 import { useState, useRef } from "react";
+import TerritoryDetailPopup from "../territories/TerritoryDetail";
+import PersonDetailPopup from "../people/PersonDetail";
+import StoreDetailPopup from "../stores/StoreDetail";
+import CustomerDetailPopup from "./CustomerDetail";
 import EditCustomerModal from "@/components/EditCustomerModal";
 import { API_BASE_URL } from "@/lib/config";
-import CustomerDetailPopup from "./CustomerDetail";
-
 export default function CustomersPage() {
   const [editCustomer, setEditCustomer] = useState<Customer | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -15,12 +17,70 @@ export default function CustomersPage() {
   const [searchedCustomer, setSearchedCustomer] = useState<Customer | null>(null);
   const [searchError, setSearchError] = useState("");
 
+  const [detailCustomer, setDetailCustomer] = useState<Customer | null>(null);
+  const [detailTerritory, setDetailTerritory] = useState<any | null>(null);
+  const [detailPerson, setDetailPerson] = useState<any | null>(null);
+  const [detailStore, setDetailStore] = useState<any | null>(null);
+
   const customerColumns = [
-    { key: "id", label: "ID" },
+    {
+      key: "id",
+      label: "ID",
+      render: (row: Customer) => (
+        <button
+          className="text-blue-600 hover:underline px-2 py-1"
+          onClick={() => setDetailCustomer(row)}
+        >
+          {row.id}
+        </button>
+      ),
+    },
     { key: "account_number", label: "Account Number" },
-    { key: "territory_id", label: "Territory ID" },
-    { key: "person_id", label: "Person ID" },
-    { key: "store_id", label: "Store ID" },
+    {
+      key: "territory_id",
+      label: "Territory ID",
+      render: (row: Customer) => row.territory_id ? (
+        <button
+          className="text-blue-600 hover:underline px-2 py-1"
+          onClick={async () => {
+            const res = await fetch(`${API_BASE_URL}/api/territories/${row.territory_id}`);
+            if (res.ok) setDetailTerritory(await res.json());
+          }}
+        >
+          {row.territory_id}
+        </button>
+      ) : null,
+    },
+    {
+      key: "person_id",
+      label: "Person ID",
+      render: (row: Customer) => row.person_id ? (
+        <button
+          className="text-blue-600 hover:underline px-2 py-1"
+          onClick={async () => {
+            const res = await fetch(`${API_BASE_URL}/api/persons/${row.person_id}`);
+            if (res.ok) setDetailPerson(await res.json());
+          }}
+        >
+          {row.person_id}
+        </button>
+      ) : null,
+    },
+    {
+      key: "store_id",
+      label: "Store Business ID",
+      render: (row: Customer) => row.store_id ? (
+        <button
+          className="text-blue-600 hover:underline px-2 py-1"
+          onClick={async () => {
+            const res = await fetch(`${API_BASE_URL}/api/persons/${row.store_id}`);
+            if (res.ok) setDetailStore(await res.json());
+          }}
+        >
+          {row.store_id}
+        </button>
+      ) : null,
+    },
     {
       key: "edit",
       label: "",
@@ -84,6 +144,18 @@ export default function CustomersPage() {
       {searchError && <div className="text-red-600 mb-2">{searchError}</div>}
       {searchedCustomer && (
         <CustomerDetailPopup customer={searchedCustomer} onClose={() => setSearchedCustomer(null)} />
+      )}
+      {detailCustomer && (
+        <CustomerDetailPopup customer={detailCustomer} onClose={() => setDetailCustomer(null)} />
+      )}
+      {detailTerritory && (
+        <TerritoryDetailPopup territory={detailTerritory} onClose={() => setDetailTerritory(null)} />
+      )}
+      {detailPerson && (
+        <PersonDetailPopup person={detailPerson} onClose={() => setDetailPerson(null)} />
+      )}
+      {detailStore && (
+        <StoreDetailPopup store={detailStore} onClose={() => setDetailStore(null)} />
       )}
       <PaginatedTable
         ref={tableRef}

@@ -14,8 +14,21 @@ export default function TerritoriesPage() {
   const [searchedTerritory, setSearchedTerritory] = useState<Territory | null>(null);
   const [searchError, setSearchError] = useState("");
 
+  const [detailTerritory, setDetailTerritory] = useState<Territory | null>(null);
+
   const territoryColumns = [
-    { key: "id", label: "ID" },
+    {
+      key: "id",
+      label: "ID",
+      render: (row: Territory) => (
+        <button
+          className="text-blue-600 hover:underline px-2 py-1"
+          onClick={() => setDetailTerritory(row)}
+        >
+          {row.id}
+        </button>
+      ),
+    },
     { key: "name", label: "Name" },
     { key: "country_region_code", label: "Country" },
     { key: "group", label: "Group" },
@@ -80,6 +93,9 @@ export default function TerritoriesPage() {
       {searchError && <div className="text-red-600 mb-2">{searchError}</div>}
       {searchedTerritory && (
         <TerritoryDetailPopup territory={searchedTerritory} onClose={() => setSearchedTerritory(null)} />
+      )}
+      {detailTerritory && (
+        <TerritoryDetailPopup territory={detailTerritory} onClose={() => setDetailTerritory(null)} />
       )}
       {editTerritory && (
         <EditTerritoryModal

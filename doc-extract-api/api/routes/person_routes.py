@@ -15,7 +15,7 @@ def list_persons():
     cursor = request.args.get('cursor', type=int)
     limit = request.args.get('limit', type=int, default=20)
     persons = PersonService.list_persons(cursor_id=cursor, limit=limit)
-    return jsonify([p.to_dict() for p in persons]), 200
+    return jsonify(persons), 200
 
 @person_bp.route('/<int:person_id>', methods=['GET'])
 def get_person(person_id):
