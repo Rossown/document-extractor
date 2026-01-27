@@ -6,7 +6,7 @@ from sqlalchemy import text
 from api.models import db, ProductData, ProductCategory, ProductSubCategory, SalesOrderHeader, SalesOrderDetail, SalesTerritory, Customer, Person, Store
 from app import app
 # Path to your Excel file
-EXCEL_PATH = './Case Study Data.xlsx'
+EXCEL_PATH = './CaseStudyData.xlsx'
 BATCH_SIZE = 100
 
 def clean_row(row):

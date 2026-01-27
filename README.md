@@ -4,6 +4,41 @@ Extract Sales Invoice information using OpenAI API
 
 
 
+
+# Dockerized Setup
+
+## Prerequisites
+- Docker and Docker Compose installed
+
+## Quick Start
+
+1. Build and start all services (API, UI, DB, DB Import):
+	```bash
+	docker compose up --build
+	```
+
+2. Access the services:
+	- Flask API: http://localhost:5000
+	- Next.js UI: http://localhost:3000
+
+3. The database can be initialized by the `import_data.py` script
+    ```bash
+    docker exec doc-extract-api flask db init
+    docker exec doc-extract-api flask db migrate -m "init"
+    docker exec doc-extract-api flask db upgrade
+    docker compose run --rm db-init
+    ```
+
+4. To stop and remove containers:
+	```bash
+	docker compose down
+	```
+
+5. To start in disconnect terminal:
+    ```bash
+    docker compose up -d
+    ```
+
 # Setup
 
 ## Flask commands

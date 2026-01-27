@@ -1,0 +1,9 @@
+# Dockerfile for DB Importer (import_data.py)
+FROM python:3.11-slim
+WORKDIR /app
+COPY doc-extract-api/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+COPY doc-extract-api/ ./doc-extract-api/
+COPY import_data.py ./import_data.py
+COPY CaseStudyData.xlsx ./CaseStudyData.xlsx
+CMD ["python", "import_data.py"]
