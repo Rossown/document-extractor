@@ -31,7 +31,7 @@ services:
     container_name: doc-extract-db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: swimming98
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: doc_extract_api_db
     ports:
       - "5432:5432"
@@ -50,7 +50,7 @@ services:
       - DB_HOST=db
       - DB_PORT=5432
       - DB_USER=postgres
-      - DB_PASSWORD=swimming98
+      - DB_PASSWORD=postgres
       - DB_NAME=doc_extract_api_db
     volumes:
       - ./import_data.py:/app/import_data.py
