@@ -22,7 +22,7 @@ This project is a modular Flask REST API for document and sales data management,
    DB_CONN_STRING=postgresql://username:password@localhost:5432/doc_extract_api_db
    DB_USER=postgres
    DB_PASSWORD=your_password
-   DB_HOST=localhost
+   DB_HOST=db
    DB_PORT=5432
    DB_NAME=doc_extract_api_db
    API_TIMEOUT=10
