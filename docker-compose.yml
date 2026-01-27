@@ -1,0 +1,60 @@
+# Docker Compose for Flask API, Next.js UI, and DB Import
+# version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./doc-extract-api
+    container_name: doc-extract-api
+    env_file:
+      - ./doc-extract-api/.env
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./doc-extract-api/uploads:/app/uploads
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./doc-extract-ui
+    container_name: doc-extract-ui
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:5000/
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:16
+    container_name: doc-extract-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: swimming98
+      POSTGRES_DB: doc_extract_api_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  db-init:
+    build:
+      context: .
+      dockerfile: Dockerfile.dbinit
+    container_name: db-importer
+    depends_on:
+      - db
+      - backend
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=swimming98
+      - DB_NAME=doc_extract_api_db
+    volumes:
+      - ./import_data.py:/app/import_data.py
+      - ./CaseStudyData.xlsx:/app/CaseStudyData.xlsx
+
+volumes:
+  pgdata:
