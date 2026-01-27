@@ -14,13 +14,18 @@ interface PaginatedTableProps<T> {
   columns: readonly Column<T>[];
   endpoint: string;
   pageSize?: number;
+  filterId?: string;
 }
 
-const PaginatedTableInner = <T extends { id: number }>({
-  columns,
-  endpoint,
-  pageSize = 20,
-}: PaginatedTableProps<T>, ref: React.Ref<{ reload: () => void }>) => {
+const PaginatedTableInner = <T extends { id: number }>(
+  {
+    columns,
+    endpoint,
+    pageSize = 20,
+    filterId = "",
+  }: PaginatedTableProps<T>,
+  ref: React.Ref<{ reload: () => void }>
+) => {
   const [data, setData] = useState<T[]>([]);
   const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
   const [prevCursors, setPrevCursors] = useState<(string | undefined)[]>([]); // history of cursors, include undefined for first page
@@ -33,12 +38,31 @@ const PaginatedTableInner = <T extends { id: number }>({
       const url = new URL(`${API_BASE_URL}${endpoint}`);
       url.searchParams.set("limit", pageSize.toString());
       if (cursor) url.searchParams.set("cursor", cursor);
+      if (filterId && filterId.trim() !== "") {
+        url.searchParams.set("id", filterId.trim());
+      }
 
       const res = await fetch(url.toString());
-      const json: PaginatedResponse<T> = await res.json();
+      let json: any = null;
+      try {
+        json = await res.json();
+      } catch {
+        json = null;
+      }
 
-      setData(json.items);
-      setNextCursor(json.next_cursor);
+      if (!res.ok || !json) {
+        setData([]);
+        setNextCursor(undefined);
+      } else if (json && Array.isArray(json.items)) {
+        setData(json.items);
+        setNextCursor(json.next_cursor);
+      } else if (Array.isArray(json)) {
+        setData(json);
+        setNextCursor(undefined);
+      } else {
+        setData([]);
+        setNextCursor(undefined);
+      }
 
       if (direction === 'next') {
         setPrevCursors((prev) => [...prev, currentCursor]);
@@ -52,12 +76,12 @@ const PaginatedTableInner = <T extends { id: number }>({
   };
 
   useEffect(() => {
-    setData([]); // reset data when endpoint changes
+    setData([]); // reset data when endpoint or filter changes
     setNextCursor(undefined);
     setPrevCursors([]); // start with empty stack
     setCurrentCursor(undefined); // first page cursor is undefined
     fetchPage(undefined); // initial load
-  }, [endpoint]);
+  }, [endpoint, filterId]);
 
   useImperativeHandle(ref, () => ({
     reload: () => fetchPage(undefined),

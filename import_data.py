@@ -2,6 +2,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'doc-extract-api')))
 import pandas as pd
+from sqlalchemy import text
 from api.models import db, ProductData, ProductCategory, ProductSubCategory, SalesOrderHeader, SalesOrderDetail, SalesTerritory, Customer, Person, Store
 from app import app
 # Path to your Excel file
@@ -19,6 +20,29 @@ def clean_row(row):
         else:
             cleaned[k] = v
     return cleaned
+
+#  public | customer            | table | postgres
+#  public | person              | table | postgres
+#  public | product_category    | table | postgres
+#  public | product_data        | table | postgres
+#  public | product_subcategory | table | postgres
+#  public | sales_order_detail  | table | postgres
+#  public | sales_order_header  | table | postgres
+#  public | sales_territory     | table | postgres
+#  public | store               | table | postgres
+def set_sequences():
+    with app.app_context():
+        db.session.execute(text("SELECT setval('customer_id_seq', (SELECT MAX(id) FROM customer) + 1);"))
+        db.session.execute(text("SELECT setval('person_business_entity_id_seq', (SELECT MAX(id) FROM person) + 1);"))
+        db.session.execute(text("SELECT setval('product_category_id_seq', (SELECT MAX(id) FROM product_category) + 1);"))
+        db.session.execute(text("SELECT setval('product_data_id_seq', (SELECT MAX(id) FROM product_data) + 1);"))
+        db.session.execute(text("SELECT setval('product_subcategory_id_seq', (SELECT MAX(id) FROM product_subcategory) + 1);"))
+        db.session.execute(text("SELECT setval('sales_order_detail_id_seq', (SELECT MAX(id) FROM sales_order_detail) + 1);"))
+        db.session.execute(text("SELECT setval('sales_order_header_id_seq', (SELECT MAX(id) FROM sales_order_header) + 1);"))
+        db.session.execute(text("SELECT setval('sales_territory_id_seq', (SELECT MAX(id) FROM sales_territory) + 1);"))
+        db.session.execute(text("SELECT setval('store_business_entity_id_seq', (SELECT MAX(id) FROM store) + 1);"))
+        db.session.commit()
+    print("Sequences set successfully")
 
 def import_data():
     # Load the Excel file
@@ -163,8 +187,12 @@ def import_data():
             if batch:
                 db.session.add_all(batch)
                 db.session.commit()
+                
 
             print(f"Imported {len(df)} records into {model.__tablename__}.")
+            
+            
 
 if __name__ == '__main__':
     import_data()
+    set_sequences()

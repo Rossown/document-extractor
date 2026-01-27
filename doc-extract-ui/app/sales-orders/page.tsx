@@ -9,7 +9,7 @@ import TerritoryDetailPopup from "../territories/TerritoryDetail";
 import { Person } from "@/app/types";
 import StoreDetailPopup from "../stores/StoreDetail";
 import { API_BASE_URL } from "@/lib/config";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function SalesOrdersPage() {
   // ...existing code...
@@ -146,58 +146,31 @@ export default function SalesOrdersPage() {
     if (res.ok) setDetailStore(await res.json());
   };
 
-  const [searchId, setSearchId] = useState("");
-  const [searchedOrder, setSearchedOrder] = useState<SalesOrderHeader | null>(null);
-  const [searchError, setSearchError] = useState("");
+  const [filterId, setFilterId] = useState("");
+  const tableRef = useRef<{ reload: () => void }>(null);
 
-  const handleSearch = async (e: React.FormEvent) => {
+  const handleFilter = (e: React.FormEvent) => {
     e.preventDefault();
-    setSearchError("");
-    setSearchedOrder(null);
-    if (!searchId) return;
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/sales-orders/${searchId}`);
-      if (!res.ok) throw new Error("Sales order not found");
-      const data = await res.json();
-      setSearchedOrder(data);
-    } catch {
-      setSearchError("Sales order not found");
-    }
+    setTimeout(() => tableRef.current?.reload(), 0);
   };
 
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Sales Orders</h1>
-      <form onSubmit={handleSearch} className="mb-4 flex gap-2">
+      <form onSubmit={handleFilter} className="mb-4 flex gap-2">
         <input
           type="text"
-          placeholder="Search by sales order ID..."
-          value={searchId}
-          onChange={e => setSearchId(e.target.value)}
+          placeholder="Filter by sales order ID..."
+          value={filterId}
+          onChange={e => setFilterId(e.target.value)}
           className="border px-2 py-1 rounded w-64"
         />
-        <button type="submit" className="bg-blue-600 text-white px-4 py-1 rounded">Search</button>
+        <button type="submit" className="bg-blue-600 text-white px-4 py-1 rounded">Filter</button>
+        {filterId && (
+          <button type="button" className="bg-gray-400 text-white px-4 py-1 rounded" onClick={() => { setFilterId(""); setTimeout(() => tableRef.current?.reload(), 0); }}>Clear</button>
+        )}
       </form>
-      {searchError && <div className="text-red-600 mb-2">{searchError}</div>}
-      {searchedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.15)" }}>
-          <div className="rounded-lg shadow-lg p-6 min-w-[320px] max-w-[90vw] relative bg-gray-50 dark:bg-gray-200" style={{ color: "var(--color-foreground, #171717)" }}>
-            <button
-              onClick={() => setSearchedOrder(null)}
-              className="absolute top-2 right-2 w-10 h-10 flex items-center justify-center rounded-full bg-red-500 text-white text-2xl font-extrabold shadow-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 z-10"
-              aria-label="Close"
-            >
-              ×
-            </button>
-            <h2 className="text-xl font-bold mb-2">Sales Order #{searchedOrder.id}</h2>
-            <div className="mb-2">Order Date: {searchedOrder.order_date}</div>
-            <div className="mb-2">Status: {searchedOrder.status}</div>
-            <div className="mb-2">Total Due: {searchedOrder.total_due != null ? searchedOrder.total_due.toLocaleString("en-US", { style: "currency", currency: "USD" }) : ""}</div>
-            {/* Add more fields as needed */}
-          </div>
-        </div>
-      )}
-      <PaginatedTable columns={salesOrderColumns} endpoint="/api/sales-orders" />
+      <PaginatedTable ref={tableRef} columns={salesOrderColumns} endpoint="/api/sales-orders/filter" filterId={filterId} />
       {detailCustomer && (
         <CustomerDetailPopup customer={detailCustomer} onClose={() => setDetailCustomer(null)} />
       )}

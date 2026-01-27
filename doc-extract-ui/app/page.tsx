@@ -2,12 +2,19 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import Toast from "@/components/Toast";
 import FileUploadModal from "@/components/FileUploadModal";
 import { API_BASE_URL } from "@/lib/config";
 
 export default function Home() {
   const [showUpload, setShowUpload] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState<{
+    message: string;
+    type?: 'success' | 'error' | 'info';
+    show: boolean;
+    link?: { href: string; label?: string };
+  }>({ message: '', type: 'info', show: false });
 
 
 
@@ -15,19 +22,33 @@ export default function Home() {
     setShowUpload(false); // Close modal immediately
     setLoading(true);
     try {
-      // Simulate processing delay
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-      // Uncomment below to actually upload to backend
-      // const formData = new FormData();
-      // formData.append("file", file);
-      // const response = await fetch(`${API_BASE_URL}/api/upload`, {
-      //   method: "POST",
-      //   body: formData,
-      // });
-      // if (!response.ok) throw new Error("Upload failed");
-      alert("File processed successfully!");
-    } catch (err) {
-      alert("File processing failed.");
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await fetch(`${API_BASE_URL}/api/invoices`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        const errorMsg = data && data.error ? `File processing failed: ${data.error}` : "File processing failed.";
+        setToast({ message: errorMsg, type: "error", show: true });
+        return;
+      }
+      if (data && data.order_id) {
+        setToast({
+          message: "File processed successfully!",
+          type: "success",
+          show: true,
+          link: {
+            href: `/sales-details/${data.order_id}`,
+            label: "View Sales Order"
+          }
+        });
+      } else {
+        setToast({ message: "File processed successfully!", type: "success", show: true });
+      }
+    } catch (err: any) {
+      setToast({ message: `File processing failed. ${err?.message || ''}`.trim(), type: "error", show: true });
     } finally {
       setLoading(false);
     }
@@ -35,7 +56,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-white text-gray-900 px-4">
-      {/* Dark mode toggle moved to Header */}
       <div className="max-w-2xl w-full text-center">
         <Image src="/globe.svg" alt="Document Extractor Logo" width={96} height={96} className="mx-auto mb-6" />
         <h1 className="text-4xl font-bold mb-4">Document Extractor</h1>
@@ -64,6 +84,13 @@ export default function Home() {
           </div>
         </div>
       )}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        show={toast.show}
+        onClose={() => setToast((t) => ({ ...t, show: false }))}
+        link={toast.link}
+      />
     </main>
   );
 }

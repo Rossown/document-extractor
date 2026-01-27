@@ -23,7 +23,7 @@ class AIService:
                 {
                     "role": "user",
                     "content": [
-                        {"type": "input_text", "text": "Extract all text from this image."},
+                        {"type": "input_text", "text": "Extract all text from this image. If no text is found, respond with 'There is no visible text in this image.'"},
                         {"type": "input_image", "image_url": data_url}
                     ],
                 }
@@ -45,6 +45,7 @@ class AIService:
         Do NOT fabricate IDs.
         Do NOT include commentary or explanations.
         Images are base64 encoded
+        If no invoice data is found, return an empty JSON object without any fields.
 
         JSON Schema:
         {{
@@ -153,7 +154,7 @@ class AIService:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You extract structured invoice data and return only valid JSON."
+                        "content": "You extract structured invoice data and return only valid JSON. If you cannot find any invoice data, return an empty JSON object."
                     },
                     {
                         "role": "user",
@@ -184,6 +185,69 @@ class AIService:
         except Exception as e:
             logger.error(f"Error during invoice extraction: {e}")
             raise Exception(f"Failed to extract invoice data: {e}")
+        
+    @staticmethod
+    def map_territory(territory_payload: dict):
+        """
+        Create or resolve a SalesTerritory object from AI JSON.
+        Returns the SalesTerritory.id to be used in other models.
+        """
+        from api.models import SalesTerritory
+        if not territory_payload:
+            return None
+        territory_id = territory_payload.get("id")
+        name = territory_payload.get("name")
+        country_region_code = territory_payload.get("country_region_code")
+        group = territory_payload.get("group")
+        territory = None
+        if territory_id:
+            territory = SalesTerritory.query.get(territory_id)
+        if not territory and name:
+            territory = SalesTerritory.query.filter_by(name=name).first()
+        if not territory and name:
+            territory = SalesTerritory(name=name, country_region_code=country_region_code, group=group)
+            db.session.add(territory)
+            db.session.flush()
+        return getattr(territory, "id", None)
+
+    @staticmethod
+    def map_product(product_payload: dict):
+        """
+        Create or resolve a ProductData object from AI JSON.
+        Returns the ProductData.id to be used in SalesOrderDetail.
+        """
+        from api.models import ProductData, ProductCategory, ProductSubCategory
+        if not product_payload:
+            return None
+        product_number = product_payload.get("product_number")
+        product = None
+        if product_number:
+            product = ProductData.query.filter_by(product_number=product_number).first()
+        if not product:
+            # Handle category/subcategory creation if present
+            category_obj = None
+            if "category" in product_payload and product_payload["category"]:
+                cat = product_payload["category"]
+                category_obj = ProductCategory.query.filter_by(name=cat.get("name")).first()
+                if not category_obj and cat.get("name"):
+                    category_obj = ProductCategory(name=cat["name"])
+                    db.session.add(category_obj)
+                    db.session.flush()
+            subcat_obj = None
+            if "subcategory" in product_payload and product_payload["subcategory"]:
+                subcat = product_payload["subcategory"]
+                subcat_obj = ProductSubCategory.query.filter_by(name=subcat.get("name")).first()
+                if not subcat_obj and subcat.get("name"):
+                    subcat_obj = ProductSubCategory(name=subcat["name"], category_id=getattr(category_obj, "id", None))
+                    db.session.add(subcat_obj)
+                    db.session.flush()
+            prod_fields = {k: v for k, v in product_payload.items() if v is not None and k not in ["category", "subcategory"]}
+            if subcat_obj:
+                prod_fields["product_subcategory_id"] = subcat_obj.id
+            product = ProductData(**prod_fields)
+            db.session.add(product)
+            db.session.flush()
+        return getattr(product, "id", None)
         
     @staticmethod
     def map_sales_order_header(extracted: dict) -> SalesOrderHeader:
@@ -338,18 +402,32 @@ class AIService:
         return None
     
     
+
     @staticmethod
     def save_extracted_invoice(extracted: dict):
-        # Step 1: resolve customer
+        # 1. Store/Person/Customer
         customer_id = AIService.map_customer(extracted["sales_order_header"].get("customer"))
         extracted["sales_order_header"]["customer"]["customer_id"] = customer_id
 
-        # Step 2: create SalesOrderHeader
+        # 2. SalesTerritory
+        territory_payload = extracted["sales_order_header"].get("territory")
+        if territory_payload:
+            territory_id = AIService.map_territory(territory_payload)
+            extracted["sales_order_header"]["territory_id"] = territory_id
+
+        # 3. Product mapping for each detail
+        for detail in extracted.get("sales_order_details", []):
+            product_data = detail.get("product")
+            if product_data and any(product_data.values()):
+                product_id = AIService.map_product(product_data)
+                detail["product_id"] = product_id
+
+        # 4. SalesOrderHeader (uses updated payload)
         order = AIService.map_sales_order_header(extracted)
         db.session.add(order)
         db.session.flush()  # get order.id
 
-        # Step 3: create SalesOrderDetails
+        # 5. SalesOrderDetails (uses updated details)
         details = AIService.map_sales_order_details(extracted, order.id)
         db.session.add_all(details)
 

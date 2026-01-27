@@ -23,6 +23,13 @@ def get_sales_order(order_id):
     order = SalesOrderService.get_sales_order_by_id(order_id)
     return jsonify(order.to_dict()), 200
     
+@sales_order_bp.route('/filter', methods=['GET'])
+def get_sales_orders_by_filter():
+    cursor = request.args.get('cursor', type=int)
+    limit = request.args.get('limit', type=int, default=20)
+    filter_params = request.args.to_dict()
+    orders = SalesOrderService.get_sales_order_by_filter(filter_params, cursor_id=cursor, limit=limit)
+    return jsonify(orders), 200
 
 @sales_order_bp.route('/<int:order_id>', methods=['PUT'])
 def update_sales_order(order_id):

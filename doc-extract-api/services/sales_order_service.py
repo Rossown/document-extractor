@@ -44,6 +44,18 @@ class SalesOrderService:
         return paginate(query, order_by=SalesOrderHeader.id, cursor_id=cursor_id, limit=limit)
     
     @staticmethod
+    def get_sales_order_by_filter(filter_params, cursor_id=None, limit=Config.PAGINATION_DEFAULT_LIMIT):
+        query = SalesOrderHeader.query
+        from sqlalchemy import cast, String
+        for key, value in filter_params.items():
+            if hasattr(SalesOrderHeader, key):
+                column = getattr(SalesOrderHeader, key)
+                query = query.filter(cast(column, String).ilike(f"{value}%"))
+        if not query.first():
+            raise NotFoundError("No sales orders found matching the filter criteria.")
+        return paginate(query, order_by=SalesOrderHeader.id, cursor_id=cursor_id, limit=limit)
+    
+    @staticmethod
     def update_sales_order(order_id, **kwargs):
         for key in Config.SALES_ORDER_HEADER_ALLOWED_FIELDS:
             if key not in kwargs.keys():

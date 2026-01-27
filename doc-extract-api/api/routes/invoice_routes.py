@@ -26,27 +26,17 @@ def create_invoice():
         if file_ext in ['png', 'jpg', 'jpeg']:
             document_text = ai_service.extract_from_image(file)
             print(f"Extracted text from image: {document_text}")
+            # Validation: reject if no meaningful text found
+            if not document_text or document_text.strip() == '' or document_text.lower().startswith('there is no visible text'):
+                return jsonify({"error": "No invoice text found in image. Please upload a valid invoice image."}), 400
         else:
             document_text = document_service.extract_text_from_file(file)
         
-        response = ai_service.extract_invoice_data(document_text) # Json 
-        
-        # Order to create models in
-        # ('StoreCustomers', Store),
-        # ('IndividualCustomers', Person),
-        # ('SalesTerritory', SalesTerritory),
-        # ('Customers', Customer),
-        # ('SalesOrderHeader', SalesOrderHeader),
-        # ('ProductCategory', ProductCategory),
-        # ('ProductSubCategory', ProductSubCategory),
-        # ('Product', ProductData),
-        # ('SalesOrderDetail', SalesOrderDetail),
-        
-        customers = AIService.map_customer(response) # either Store or Person
-        
-        logger.debug(f"Mapped customers: {customers}")
-
-
-        return jsonify({"invoice_data": response}), 201
+        response = ai_service.extract_invoice_data(document_text)
+        # Validation: if OpenAI returns empty JSON, treat as no invoice data
+        if not response or (isinstance(response, dict) and len(response) == 0):
+            return jsonify({"error": "No invoice data found in document. Please upload a valid invoice."}), 400
+        orderid = ai_service.save_extracted_invoice(response)
+        return jsonify({"invoice_data": response, "order_id": orderid}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
