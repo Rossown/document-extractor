@@ -1,0 +1,40 @@
+INVOICE STATEMENT
+
+Document ID: SI-77821
+Issue Date: 01/26/2026
+Payment Due By: 02/05/2026
+Currency: USD
+
+From:
+Blue Ridge Components, Inc.
+4400 Industrial Pkwy
+Grand Rapids, MI 49512
+Phone: (616) 555-2934
+billing@blueridgecomponents.com
+
+Customer:
+Atlas Robotics Corp
+215 Innovation Way
+Boulder, CO 80301
+
+Order Ref: PO-99177
+Ship Via: UPS Ground
+
+Line Items:
+================================================================================
+SKU        Description                         Units   Rate        Amount
+--------------------------------------------------------------------------------
+BR-221     Servo Motor Assembly                 3     $840.00     $2,520.00
+BR-804     Sensor Cable Harness (10m)          10      $72.00       $720.00
+SRV-LAB    Field Calibration Service            6     $115.00       $690.00
+================================================================================
+
+Merchandise Total: $3,930.00
+Freight: $85.00
+Tax (5.5%): $216.15
+
+GRAND TOTAL DUE: $4,231.15
+
+Remittance Instructions:
+Make payment payable to Blue Ridge Components, Inc.
+ACH routing details provided upon request.

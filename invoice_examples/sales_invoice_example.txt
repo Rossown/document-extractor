@@ -1,0 +1,32 @@
+SALES INVOICE
+
+Invoice #: INV-2026-001
+Invoice Date: January 26, 2026
+Due Date: February 9, 2026
+
+Seller:
+Acme Industrial Supplies
+1234 Market Street
+Detroit, MI 48201
+support@acmeindustrial.com
+
+Bill To:
+Orion Manufacturing Co.
+7890 Innovation Drive
+Austin, TX 73301
+
+Items:
+-------------------------------------------------
+1. Precision Gear Assembly      Qty: 2   Unit: $1,250.00   Line: $2,500.00
+2. Hydraulic Hose Kit           Qty: 5   Unit: $180.00     Line: $900.00
+3. Installation Labor           Qty: 4   Unit: $95.00      Line: $380.00
+-------------------------------------------------
+
+Subtotal: $3,780.00
+Sales Tax (6%): $226.80
+Total Due: $4,006.80
+
+Payment Terms:
+Net 14. Payment via ACH or check.
+
+Thank you for your business.
