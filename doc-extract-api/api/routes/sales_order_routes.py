@@ -3,6 +3,7 @@ from services.sales_order_service import SalesOrderService
 
 sales_order_bp = Blueprint('sales-orders', __name__)
 
+# Sales Order Routes
 @sales_order_bp.route('', methods=['POST'])
 def create_sales_order():
     data = request.get_json()
@@ -42,7 +43,7 @@ def delete_sales_order(order_id):
     SalesOrderService.delete_sales_order(order_id)
     return jsonify({"message": "Sales order deleted successfully"}), 204
 
-# Sales Order Details
+# Sales Order Details Routes
 @sales_order_bp.route('/<int:order_id>/details', methods=['POST'])
 def add_sales_order_detail(order_id):
     data = request.get_json()

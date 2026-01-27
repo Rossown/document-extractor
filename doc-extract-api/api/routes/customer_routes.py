@@ -26,7 +26,7 @@ def get_customer(customer_id):
 @customer_bp.route('/<int:customer_id>', methods=['PUT'])
 def update_customer(customer_id):
     data = request.get_json()
-    data.pop("id", None)  # Remove id if present to avoid updating the primary key
+    data.pop("id", None)
     result = CustomerService.update_customer(customer_id, **data)
     return jsonify(result.to_dict()), 200
 

@@ -163,7 +163,7 @@ class AIService:
                 ],
                 temperature=1,
                 max_completion_tokens=AIService.max_tokens,
-                response_format={"type": "json_object"}  # <-- IMPORTANT
+                response_format={"type": "json_object"}
             )
             
             # Extract the response content
@@ -422,12 +422,12 @@ class AIService:
                 product_id = AIService.map_product(product_data)
                 detail["product_id"] = product_id
 
-        # 4. SalesOrderHeader (uses updated payload)
+        # 4. SalesOrderHeader
         order = AIService.map_sales_order_header(extracted)
         db.session.add(order)
         db.session.flush()  # get order.id
 
-        # 5. SalesOrderDetails (uses updated details)
+        # 5. SalesOrderDetails
         details = AIService.map_sales_order_details(extracted, order.id)
         db.session.add_all(details)
 

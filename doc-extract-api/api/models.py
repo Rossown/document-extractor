@@ -50,7 +50,6 @@ class ProductSubCategory(BaseModel):
     def __repr__(self):
         return f'<ProductSubCategory {self.name}>'
 
-# Done
 class SalesOrderHeader(BaseModel):
     __tablename__ = 'sales_order_header'
     id = db.Column(db.BigInteger, primary_key=True)
@@ -81,8 +80,7 @@ class SalesOrderHeader(BaseModel):
 
     def __repr__(self):
         return f'<SalesOrderHeader {self.id}>'
-
-# Done    
+   
 class SalesOrderDetail(BaseModel):
     __tablename__ = 'sales_order_detail'
     id = db.Column(db.BigInteger, primary_key=True)
@@ -98,7 +96,6 @@ class SalesOrderDetail(BaseModel):
     def __repr__(self):
         return f'<SalesOrderDetail {self.id} for Order {self.sales_order_id}>'
     
-# Done
 class SalesTerritory(BaseModel):
     __tablename__ = 'sales_territory'
     id = db.Column(db.BigInteger, primary_key=True)
@@ -108,8 +105,7 @@ class SalesTerritory(BaseModel):
 
     def __repr__(self):
         return f'<SalesTerritory {self.name}>'
-
-# Done    
+  
 class Customer(BaseModel):
     __tablename__ = 'customer'
     id = db.Column(db.BigInteger, primary_key=True)
@@ -125,7 +121,6 @@ class Customer(BaseModel):
             return f'<Customer {self.person.first_name} {self.person.last_name}>'
         return f'<Customer {self.account_number}>'
     
-# Done
 class Person(BaseModel):
     __tablename__ = 'person'
     id = db.Column(db.BigInteger)
@@ -144,7 +139,6 @@ class Person(BaseModel):
     def __repr__(self):
         return f'<Person {self.first_name} {self.last_name}>'
 
-# Done    
 class Store(BaseModel):
     __tablename__ = 'store'
     id = db.Column(db.BigInteger)

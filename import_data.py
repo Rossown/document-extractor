@@ -21,15 +21,6 @@ def clean_row(row):
             cleaned[k] = v
     return cleaned
 
-#  public | customer            | table | postgres
-#  public | person              | table | postgres
-#  public | product_category    | table | postgres
-#  public | product_data        | table | postgres
-#  public | product_subcategory | table | postgres
-#  public | sales_order_detail  | table | postgres
-#  public | sales_order_header  | table | postgres
-#  public | sales_territory     | table | postgres
-#  public | store               | table | postgres
 def set_sequences():
     with app.app_context():
         db.session.execute(text("SELECT setval('customer_id_seq', (SELECT MAX(id) FROM customer) + 1);"))

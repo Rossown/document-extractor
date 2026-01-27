@@ -87,7 +87,6 @@ class DocumentService:
                         text += page.extract_text()
                 
                 logger.info(f"Text extracted from PDF: {filepath}")
-                # logger.info(f"Text: {text}")
                 
                 return text
             

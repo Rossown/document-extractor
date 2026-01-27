@@ -3,7 +3,7 @@ from services.product_service import ProductService
 
 product_bp = Blueprint('products', __name__)
 
-# ProductData
+# ProductData Routes
 @product_bp.route('', methods=['POST'])
 def create_product():
     data = request.get_json()
