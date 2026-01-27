@@ -27,6 +27,7 @@ This project is a modular Flask REST API for document and sales data management,
    DB_NAME=doc_extract_api_db
    API_TIMEOUT=10
    API_RETRIES=3
+   OPENAI_API_KEY=
    ```
 
 3. **Run the app**
