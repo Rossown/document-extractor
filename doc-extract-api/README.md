@@ -19,7 +19,7 @@ This project is a modular Flask REST API for document and sales data management,
 
 2. **Configure `.env`**
    ```env
-   DB_CONN_STRING=postgresql://username:password@localhost:5432/doc_extract_api_db
+   DB_CONN_STRING=postgresql://username:password@db:5432/doc_extract_api_db
    DB_USER=postgres
    DB_PASSWORD=your_password
    DB_HOST=db
