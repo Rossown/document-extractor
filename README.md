@@ -17,6 +17,9 @@ Extract Sales Invoice information using OpenAI API
 	docker compose up --build
 	```
 
+    - If API Container does not start right away, start manually
+    - If any errors during first run, try removing the database volume
+
 2. Access the services:
 	- Flask API: http://localhost:5000
 	- Next.js UI: http://localhost:3000
